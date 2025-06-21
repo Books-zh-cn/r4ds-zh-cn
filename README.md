@@ -6,7 +6,7 @@ Try to translate R for Data Science (the second edition) into Simplified Chinese
 
 -   **Original Book**: [r4ds](https://r4ds.hadley.nz/)
 
--   **Translation Book**: [r4ds-zh-cn](https://ZhengTiger.github.io/r4ds-zh-cn/)
+-   **Translation Book**: [r4ds-zh-cn](https://books-zh-cn.github.io/r4ds-zh-cn/)
 
 ## Translation progress
 
