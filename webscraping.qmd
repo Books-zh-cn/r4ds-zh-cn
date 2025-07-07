@@ -402,11 +402,11 @@ Our goal is to turn this data into a 7 row data frame with variables `title`, `y
 We'll start by reading the HTML and extracting all the `<section>` elements:
 
 ```{r}
-url <- "https://rvest.tidyverse.org/articles/starwars.html"
-html <- read_html(url)
+#url <- "https://rvest.tidyverse.org/articles/starwars.html"
+#html <- read_html(url)
 
-section <- html |> html_elements("section")
-section
+#section <- html |> html_elements("section")
+#section
 ```
 
 This retrieves seven elements matching the seven movies found on that page, suggesting that using `section` as a selector is good.
@@ -414,30 +414,30 @@ Extracting the individual elements is straightforward since the data is always f
 It's just a matter of finding the right selector:
 
 ```{r}
-section |> html_element("h2") |> html_text2()
+#section |> html_element("h2") |> html_text2()
 
-section |> html_element(".director") |> html_text2()
+#section |> html_element(".director") |> html_text2()
 ```
 
 Once we've done that for each component, we can wrap all the results up into a tibble:
 
 ```{r}
-tibble(
-  title = section |> 
-    html_element("h2") |> 
-    html_text2(),
-  released = section |> 
-    html_element("p") |> 
-    html_text2() |> 
-    str_remove("Released: ") |> 
-    parse_date(),
-  director = section |> 
-    html_element(".director") |> 
-    html_text2(),
-  intro = section |> 
-    html_element(".crawl") |> 
-    html_text2()
-)
+#tibble(
+#  title = section |> 
+#    html_element("h2") |> 
+#    html_text2(),
+#  released = section |> 
+#    html_element("p") |> 
+#    html_text2() |> 
+#    str_remove("Released: ") |> 
+#    parse_date(),
+#  director = section |> 
+#    html_element(".director") |> 
+#    html_text2(),
+#  intro = section |> 
+#    html_element(".crawl") |> 
+#    html_text2()
+#)
 ```
 
 We did a little more processing of `released` to get a variable that will be easy to use later in our analysis.
