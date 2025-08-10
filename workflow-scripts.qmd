@@ -1,10 +1,8 @@
 # Workflow: scripts and projects {#sec-workflow-scripts-projects}
 
 ```{r}
-#| results: "asis"
 #| echo: false
 source("_common.R")
-status("complete")
 ```
 
 本章将向您介绍组织代码的两个基本工具：脚本（scripts）和项目（projects）。

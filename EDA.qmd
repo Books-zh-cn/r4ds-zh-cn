@@ -1,10 +1,8 @@
 # Exploratory data analysis {#sec-exploratory-data-analysis}
 
 ```{r}
-#| results: "asis"
 #| echo: false
 source("_common.R")
-status("complete")
 ```
 
 ## Introduction
@@ -331,13 +329,13 @@ nycflights13::flights |>
 
 ## Covariation
 
-If variation describes the behavior *within* a variable, covariation describes the behavior *between* variables.
-**Covariation** is the tendency for the values of two or more variables to vary together in a related way.
-The best way to spot covariation is to visualize the relationship between two or more variables.
+若变异（variation）描述的是单个变量*内部*的变化特征，那么协方差（covariation）则刻画的是多个变量*之间*的协同变化规律。
+**协方差（covariation）**是两个或更多变量的取值呈现关联性波动的趋势。
+要识别协方差（covariation），最有效的方式是将变量间的关联进行可视化呈现。
 
 ### A categorical and a numerical variable {#sec-cat-num}
 
-For example, let's explore how the price of a diamond varies with its quality (measured by `cut`) using `geom_freqpoly()`:
+例如，我们可通过 `geom_freqpoly()` 函数来探究钻石价格与其品质（以 `cut` 衡量）的变化关系：
 
 ```{r}
 #| fig-alt: |
@@ -352,13 +350,13 @@ ggplot(diamonds, aes(x = price)) +
   geom_freqpoly(aes(color = cut), binwidth = 500, linewidth = 0.75)
 ```
 
-Note that ggplot2 uses an ordered color scale for `cut` because it's defined as an ordered factor variable in the data.
-You'll learn more about these in @sec-ordered-factors.
+注意由于 `cut` 在数据中被定义为有序因子变量，ggplot2 自动采用了有序颜色标度，具体原理将在 @sec-ordered-factors 详述。
 
-The default appearance of `geom_freqpoly()` is not that useful here because the height, determined by the overall count, differs so much across `cut`s, making it hard to see the differences in the shapes of their distributions.
+不过 `geom_freqpoly()` 的默认输出在此场景下效果欠佳由于高度，由计数总量决定，而不同 `cut`s 等级的样本量差异悬殊，导致分布曲线的形态差异难以辨识。
 
-To make the comparison easier we need to swap what is displayed on the y-axis.
-Instead of displaying count, we'll display the **density**, which is the count standardized so that the area under each frequency polygon is one.
+为提升可比性，我们需要调整 y 轴显示方式。不
+是显示绝对计数（count），我们将显示**密度值（density）**。密
+度标准化了计数分布，使得每个频率多边形下的面积为 1。
 
 ```{r}
 #| fig-alt: |
@@ -373,13 +371,13 @@ ggplot(diamonds, aes(x = price, y = after_stat(density))) +
   geom_freqpoly(aes(color = cut), binwidth = 500, linewidth = 0.75)
 ```
 
-Note that we're mapping the density the `y`, but since `density` is not a variable in the `diamonds` dataset, we need to first calculate it.
-We use the `after_stat()` function to do so.
+需要特别说明的是，虽然我们将密度（density）映射到 `y` 轴，但由于原始数据 `diamonds` 中并不存在 `density`，我们需要先计算它。
+我们使用 `after_stat()` 函数进行计算。
 
-There's something rather surprising about this plot - it appears that fair diamonds (the lowest quality) have the highest average price!
-But maybe that's because frequency polygons are a little hard to interpret - there's a lot going on in this plot.
+这个可视化结果揭示了一个反常识现象 - 似乎一般级钻石（质量最低）的平均价格最高！
+但是这可能与频率多边形图的解读难度有关 - 图中重叠的分布曲线确实容易造成视觉混淆。
 
-A visually simpler plot for exploring this relationship is using side-by-side boxplots.
+一种视觉上更简单的图用于探索这种关系是使用并排箱线图。
 
 ```{r}
 #| fig-alt: |
@@ -392,16 +390,16 @@ ggplot(diamonds, aes(x = cut, y = price)) +
   geom_boxplot()
 ```
 
-We see much less information about the distribution, but the boxplots are much more compact so we can more easily compare them (and fit more on one plot).
-It supports the counter-intuitive finding that better quality diamonds are typically cheaper!
-In the exercises, you'll be challenged to figure out why.
+我们看到有分布的信息较少，但是箱线图更紧凑，因此我们可以更轻松地比较它们（且能在一个图中展示更多数据）。
+结果再次验证了那个反直觉的发现，即质量较高的钻石通常更便宜！
+在练习中，您将会挑战弄清楚原因。
 
-`cut` is an ordered factor: fair is worse than good, which is worse than very good and so on.
-Many categorical variables don't have such an intrinsic order, so you might want to reorder them to make a more informative display.
-One way to do that is with `fct_reorder()`.
-You'll learn more about that function in @sec-modifying-factor-order, but we want to give you a quick preview here because it's so useful.
-For example, take the `class` variable in the `mpg` dataset.
-You might be interested to know how highway mileage varies across classes:
+`cut` 作为有序因子变量，其等级从一般（fair）、良好（good）、很好（very good）到极好（ideal）具有明确递进关系。
+但许多分类变量并不具备这种内在顺序，因此您可能需要重新排序它们以显示更多信息。
+一种方法是使用 `fct_reorder()`。
+您将在 @sec-modifying-factor-order 中了解有关该功能的更多信息，但是我们想在这里为您提供快速预览，因为它非常有用。
+例如，在 `mpg` 数据集中使用 `class` 变量。
+您可能有兴趣知道高速公路里程（hwy）在各个车型类别（class）中的变化：
 
 ```{r}
 #| fig-alt: |
@@ -413,7 +411,7 @@ ggplot(mpg, aes(x = class, y = hwy)) +
   geom_boxplot()
 ```
 
-To make the trend easier to see, we can reorder `class` based on the median value of `hwy`:
+To make the trend easier to see, we can reorder `class` based on the median value of `hwy`: 为了使趋势更容易看到，我们可以根据 `hwy` 的中值重新排序 `class`：
 
 ```{r}
 #| fig-alt: |
@@ -425,8 +423,8 @@ ggplot(mpg, aes(x = fct_reorder(class, hwy, median), y = hwy)) +
   geom_boxplot()
 ```
 
-If you have long variable names, `geom_boxplot()` will work better if you flip it 90°.
-You can do that by exchanging the x and y aesthetic mappings.
+如果您有长变量名，`geom_boxplot()` 会更好地工作如果你将其翻转 90°。
+您可以通过交换 X 和 Y 美学映射来做到这一点。
 
 ```{r}
 #| fig-alt: |
@@ -439,33 +437,33 @@ ggplot(mpg, aes(x = hwy, y = fct_reorder(class, hwy, median))) +
 
 #### Exercises
 
-1.  Use what you've learned to improve the visualization of the departure times of cancelled vs. non-cancelled flights.
+1.  利用您学到的知识来改善"已取消航班与正常航班起飞时间"的可视化呈现。
 
-2.  Based on EDA, what variable in the diamonds dataset appears to be most important for predicting the price of a diamond?
-    How is that variable correlated with cut?
-    Why does the combination of those two relationships lead to lower quality diamonds being more expensive?
+2.  根据探索性数据分析（EDA），diamonds数据集中哪个变量对价格预测最具重要性？
+    该变量与cut存在何种相关性？
+    这两种关系的共同作用如何导致低品质钻石价格更高？
 
-3.  Instead of exchanging the x and y variables, add `coord_flip()` as a new layer to the vertical boxplot to create a horizontal one.
-    How does this compare to exchanging the variables?
+3.  无需调换x/y变量，通过在垂直箱线图中添加`coord_flip()`图层即可生成水平箱线图。
+    与直接交换变量的方式相比有何优劣？
 
-4.  One problem with boxplots is that they were developed in an era of much smaller datasets and tend to display a prohibitively large number of "outlying values".
-    One approach to remedy this problem is the letter value plot.
-    Install the lvplot package, and try using `geom_lv()` to display the distribution of price vs. cut.
-    What do you learn?
-    How do you interpret the plots?
+4.  箱线图的局限性在于其设计初衷是针对小规模数据集，当处理大数据时会显示过多"离群值（outlying values）"。
+    改进方案之一是采用字母值图（letter value plot）。
+    安装lvplot包后，尝试用`geom_lv()`展示price与cut的关系分布。
+    你从中学到了什么？
+    应如何解读这类图表？
 
-5.  Create a visualization of diamond prices vs. a categorical variable from the `diamonds` dataset using `geom_violin()`, then a faceted `geom_histogram()`, then a colored `geom_freqpoly()`, and then a colored `geom_density()`.
-    Compare and contrast the four plots.
-    What are the pros and cons of each method of visualizing the distribution of a numerical variable based on the levels of a categorical variable?
+5.  使用`geom_violin()`从`diamonds`数据集中创建一个可视化钻石 prices vs. 一个分类变量，然后一个 faceted `geom_histogram()`，然后一个 colored `geom_freqpoly()`，然后一个colored `geom_density()`。
+    比较和对比四个图。
+    根据分类变量的级别可视化数值变量的分布的每种方法的利弊是什么？
 
-6.  If you have a small dataset, it's sometimes useful to use `geom_jitter()` to avoid overplotting to more easily see the relationship between a continuous and categorical variable.
-    The ggbeeswarm package provides a number of methods similar to `geom_jitter()`.
-    List them and briefly describe what each one does.
+6.  如果您有一个小数据集，则有时使用`geom_jitter()`避免过度分布以更轻松地查看连续变量和分类变量之间的关系是有用的。
+    ggbeeswarm 软件包提供了许多类似于 `geom_jitter()` 的方法。
+    列出它们，并简要描述它们每个的作用。
 
 ### Two categorical variables
 
-To visualize the covariation between categorical variables, you'll need to count the number of observations for each combination of levels of these categorical variables.
-One way to do that is to rely on the built-in `geom_count()`:
+为了可视化分类变量之间的协方差，您需要计算这些分类变量级别的每种组合的观测值。
+一种方法是依靠内置的 `geom_count()`：
 
 ```{r}
 #| fig-alt: |
@@ -479,17 +477,17 @@ ggplot(diamonds, aes(x = cut, y = color)) +
   geom_count()
 ```
 
-The size of each circle in the plot displays how many observations occurred at each combination of values.
-Covariation will appear as a strong correlation between specific x values and specific y values.
+图中每个圆的大小显示在每个值组合下发生了多少观测。
+协方差将显示为特定x值与特定y值之间的强相关性。
 
-Another approach for exploring the relationship between these variables is computing the counts with dplyr:
+探索这些变量之间关系的另一种方法是使用 dplyr 计算计数（counts）：
 
 ```{r}
 diamonds |> 
   count(color, cut)
 ```
 
-Then visualize with `geom_tile()` and the fill aesthetic:
+然后用 `geom_tile()` 和 fill aesthetic 可视化：
 
 ```{r}
 #| fig-alt: |
@@ -505,26 +503,26 @@ diamonds |>
   geom_tile(aes(fill = n))
 ```
 
-If the categorical variables are unordered, you might want to use the seriation package to simultaneously reorder the rows and columns in order to more clearly reveal interesting patterns.
-For larger plots, you might want to try the heatmaply package, which creates interactive plots.
+如果分类变量是无序的，则可能需要使用seriation软件包同时重新排序行（rows）和列（columns），以便更清楚地揭示有趣的模式。
+对于较大的图，您可能需要尝试使用heatmaply软件包，从而创建交互式图。
 
 #### Exercises
 
-1.  How could you rescale the count dataset above to more clearly show the distribution of cut within color, or color within cut?
+1.  您如何重新列出上述计数数据集以更清楚地显示color内cut的分布或cut中的color？
 
-2.  What different data insights do you get with a segmented bar chart if color is mapped to the `x` aesthetic and `cut` is mapped to the `fill` aesthetic?
-    Calculate the counts that fall into each of the segments.
+2.  如果将`color`映射到`x`美学并将`cut`映射到`fill`美学，则可以通过分段条形图获得哪些不同的数据见解？
+    计算落入每个片段的计数。
 
-3.  Use `geom_tile()` together with dplyr to explore how average flight departure delays vary by destination and month of year.
-    What makes the plot difficult to read?
-    How could you improve it?
+3.  将`geom_tile()`与dplyr一起使用，以探索平均航班延误如何因目的地和一年的月份而异。
+    是什么使绘图难以阅读？
+    你怎么能改善它？
 
 ### Two numerical variables
 
-You've already seen one great way to visualize the covariation between two numerical variables: draw a scatterplot with `geom_point()`.
-You can see covariation as a pattern in the points.
-For example, you can see a positive relationship between the carat size and price of a diamond: diamonds with more carats have a higher price.
-The relationship is exponential.
+您已经看到了一种可视化两个数值变量之间的协方差的好方法：用`geom_point()`绘制散点图。
+您可以将协方差视为散点中的一种模式。
+例如，您可以看到钻石的克拉尺寸（carat）和价格（price）之间的正相关关系：具有更大克拉尺寸（carat）的钻石价格（price）更高。
+关系是指数级的。
 
 ```{r}
 #| dev: "png"
@@ -536,10 +534,10 @@ ggplot(smaller, aes(x = carat, y = price)) +
   geom_point()
 ```
 
-(In this section we'll use the `smaller` dataset to stay focused on the bulk of the diamonds that are smaller than 3 carats)
+（在本节中，我们将使用`smaller`数据集专注于小于3克拉（carats）的大部分钻石）
 
-Scatterplots become less useful as the size of your dataset grows, because points begin to overplot, and pile up into areas of uniform black, making it hard to judge differences in the density of the data across the 2-dimensional space as well as making it hard to spot the trend.
-You've already seen one way to fix the problem: using the `alpha` aesthetic to add transparency.
+随着数据集的大小的增长，散点图（Scatterplots）变得不那么有用，因为散点开始覆盖，并堆积成黑色均匀的区域，因此很难判断二维空间中数据密度的差异，并且很难发现趋势。
+您已经看到了解决该问题的一种方法：使用 `alpha` aesthetic 添加透明度。
 
 ```{r}
 #| dev: "png"
@@ -553,15 +551,15 @@ ggplot(smaller, aes(x = carat, y = price)) +
   geom_point(alpha = 1 / 100)
 ```
 
-But using transparency can be challenging for very large datasets.
-Another solution is to use bin.
-Previously you used `geom_histogram()` and `geom_freqpoly()` to bin in one dimension.
-Now you'll learn how to use `geom_bin2d()` and `geom_hex()` to bin in two dimensions.
+但是，对于非常大的数据集来说，使用透明度可能具有挑战性。
+另一个解决方案是使用 bin。
+以前，您使用 `geom_histogram()` 和 `geom_freqpoly()` 在一个维度上分 bin。
+现在，您将学习如何使用 `geom_bin2d()` 和 `geom_hex()` 在二维中分 bin。
 
-`geom_bin2d()` and `geom_hex()` divide the coordinate plane into 2d bins and then use a fill color to display how many points fall into each bin.
-`geom_bin2d()` creates rectangular bins.
-`geom_hex()` creates hexagonal bins.
-You will need to install the hexbin package to use `geom_hex()`.
+`geom_bin2d()` 和 `geom_hex()` 将坐标平面划分为 2d bins，然后使用 fill 颜色显示每个 bin 中落入多少点。
+`geom_bin2d()` 创建矩形 bins。
+`geom_hex()` 创建六角形 bins。
+您将需要安装 hexbin 软件包以使用 `geom_hex()`。
 
 ```{r}
 #| layout-ncol: 2
@@ -579,9 +577,9 @@ ggplot(smaller, aes(x = carat, y = price)) +
   geom_hex()
 ```
 
-Another option is to bin one continuous variable so it acts like a categorical variable.
-Then you can use one of the techniques for visualizing the combination of a categorical and a continuous variable that you learned about.
-For example, you could bin `carat` and then for each group, display a boxplot:
+另一个选择是对一个连续变量分 bin，以便它像一个分类变量。
+然后，您可以使用其中一种技术来可视化您所学到的分类和连续变量的组合。
+例如，您可以对 `carat` 分 bin，然后对于每个 group，显示一个箱形图：
 
 ```{r}
 #| fig-alt: |
@@ -597,26 +595,26 @@ ggplot(smaller, aes(x = carat, y = price)) +
   geom_boxplot(aes(group = cut_width(carat, 0.1)))
 ```
 
-`cut_width(x, width)`, as used above, divides `x` into bins of width `width`.
-By default, boxplots look roughly the same (apart from number of outliers) regardless of how many observations there are, so it's difficult to tell that each boxplot summaries a different number of points.
-One way to show that is to make the width of the boxplot proportional to the number of points with `varwidth = TRUE`.
+如上所述，`cut_width(x, width)` 将 `x` 分为宽度为 `width` 的 bins。
+默认情况下，无论有多少观察值，箱线图看起来大致相同（除了数量的异常值），因此很难说每个箱线图总结了不同数量的点。
+一种显示的方法是使箱线图的宽度与`varwidth = TRUE`的点数成比例。
 
 #### Exercises
 
-1.  Instead of summarizing the conditional distribution with a boxplot, you could use a frequency polygon.
-    What do you need to consider when using `cut_width()` vs. `cut_number()`?
-    How does that impact a visualization of the 2d distribution of `carat` and `price`?
+1.  您可以使用频率多边形，而不是用 boxplot 总结条件分布。
+    使用 `cut_width()` vs. `cut_number()` 时需要考虑什么？
+    这如何影响 `carat` 和 `price` 的 2d 分布的可视化？
 
-2.  Visualize the distribution of `carat`, partitioned by `price`.
+2.  可视化 `carat` 的分布，按 `price` 划分。
 
-3.  How does the price distribution of very large diamonds compare to small diamonds?
-    Is it as you expect, or does it surprise you?
+3.  非常大的钻石的价格分布与小钻石相比如何？
+    是您所期望的，还是让您感到惊讶？
 
-4.  Combine two of the techniques you've learned to visualize the combined distribution of cut, carat, and price.
+4.  结合您学会的两种技术来可视化 cut，carat 和 price 的组合分布。
 
-5.  Two dimensional plots reveal outliers that are not visible in one dimensional plots.
-    For example, some points in the following plot have an unusual combination of `x` and `y` values, which makes the points outliers even though their `x` and `y` values appear normal when examined separately.
-    Why is a scatterplot a better display than a binned plot for this case?
+5.  二维图揭示了在一维图中不可见的离群值。
+    例如，以下图中的某些点具有 `x` 和 `y` 值的异常组合，即使在单独检查时它们的 `x` 和 `y` 值显得正常，也使得散点异常。
+    为什么在这种情况下，scatterplot 比 binned plot 更好？
 
     ```{r}
     #| eval: false
@@ -627,8 +625,8 @@ One way to show that is to make the width of the boxplot proportional to the num
       coord_cartesian(xlim = c(4, 11), ylim = c(4, 11))
     ```
 
-6.  Instead of creating boxes of equal width with `cut_width()`, we could create boxes that contain roughly equal number of points with `cut_number()`.
-    What are the advantages and disadvantages of this approach?
+6.  我们可以创建包含 `cut_width()` 大约相等数量的点的箱线图，而不是使用 `cut_number()` 创建相等宽度的箱线图。
+    这种方法的优点和缺点是什么？
 
     ```{r}
     #| eval: false
@@ -638,32 +636,32 @@ One way to show that is to make the width of the boxplot proportional to the num
 
 ## Patterns and models
 
-If a systematic relationship exists between two variables it will appear as a pattern in the data.
-If you spot a pattern, ask yourself:
+如果两个变量之间存在系统关系，则将以数据模式出现。
+如果您发现模式，请问自己：
 
--   Could this pattern be due to coincidence (i.e. random chance)?
+-   这种模式可能是偶然的（即随机机会）吗？
 
--   How can you describe the relationship implied by the pattern?
+-   您如何描述模式隐含的关系？
 
--   How strong is the relationship implied by the pattern?
+-   模式暗示的关系有多牢固？
 
--   What other variables might affect the relationship?
+-   其他哪些变量可能会影响这种关系？
 
--   Does the relationship change if you look at individual subgroups of the data?
+-   如果您查看数据的各个子组，关系会改变吗？
 
-Patterns in your data provide clues about relationships, i.e., they reveal covariation.
-If you think of variation as a phenomenon that creates uncertainty, covariation is a phenomenon that reduces it.
-If two variables covary, you can use the values of one variable to make better predictions about the values of the second.
-If the covariation is due to a causal relationship (a special case), then you can use the value of one variable to control the value of the second.
+数据中的模式提供了有关关系的线索，即它们揭示了协方差。
+如果您将变化视为产生不确定性的现象，那么协方差是一种减少它的现象。
+如果两个变量共变化，您可以使用一个变量的值来更好地预测第二个变量的值。
+如果协方差是由于因果关系（特殊情况）引起的，则可以使用一个变量的值来控制第二个的值。
 
-Models are a tool for extracting patterns out of data.
-For example, consider the diamonds data.
-It's hard to understand the relationship between cut and price, because cut and carat, and carat and price are tightly related.
-It's possible to use a model to remove the very strong relationship between price and carat so we can explore the subtleties that remain.
-The following code fits a model that predicts `price` from `carat` and then computes the residuals (the difference between the predicted value and the actual value).
-The residuals give us a view of the price of the diamond, once the effect of carat has been removed.
-Note that instead of using the raw values of `price` and `carat`, we log transform them first, and fit a model to the log-transformed values.
-Then, we exponentiate the residuals to put them back in the scale of raw prices.
+模型（Models）是从数据中提取模式的工具。
+例如，考虑 diamonds 数据。
+很难理解 cut 与 price 之间的关系，因为 cut 和 carat，以及 carat 和 price 密切相关。
+可以使用模型来消除 price 和 carat 之间非常牢固的关系，因此我们可以探索剩下的微妙之处。
+以下代码拟合一个模型，该模型可以从 `carat` 预测 `price`，然后计算残差（预测值和实际值之间的差异）。
+一旦去除了 carat 的效果，残差使我们对钻石的 price 有所了解。
+请注意，我们不使用 `price` 和 `carat` 的原始值，而是首先对其进行对数转换，并将模型拟合到对数转换值。
+然后，我们指出残差以使它们的原始价格规模恢复。
 
 ```{r}
 #| message: false
@@ -692,7 +690,7 @@ ggplot(diamonds_aug, aes(x = carat, y = .resid)) +
   geom_point()
 ```
 
-Once you've removed the strong relationship between carat and price, you can see what you expect in the relationship between cut and price: relative to their size, better quality diamonds are more expensive.
+一旦你删除了 carat 和 price 之间的牢固关系后，您就可以看到 cut 与 price 之间的关系的期望：相对于它们的尺寸，质量更好的钻石更加昂贵。
 
 ```{r}
 #| fig-alt: |
@@ -705,7 +703,7 @@ ggplot(diamonds_aug, aes(x = cut, y = .resid)) +
   geom_boxplot()
 ```
 
-We're not discussing modelling in this book because understanding what models are and how they work is easiest once you have tools of data wrangling and programming in hand.
+我们不在本书中讨论建模，因为一旦您拥有数据整理和编程工具，了解什么模型以及它们的工作方式最容易。
 
 ## Summary
 

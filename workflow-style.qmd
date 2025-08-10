@@ -1,11 +1,8 @@
 # Workflow: code style {#sec-workflow-style}
 
 ```{r}
-#| results: "asis"
 #| echo: false
-
 source("_common.R")
-status("complete")
 ```
 
 良好的编码风格就像正确的标点符号：你可以不用它来管理，但它肯定会让事情更容易阅读。

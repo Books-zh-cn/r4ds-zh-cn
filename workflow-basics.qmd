@@ -1,11 +1,8 @@
 # Workflow: basics {#sec-workflow-basics}
 
 ```{r}
-#| results: "asis"
 #| echo: false
-
 source("_common.R")
-status("complete")
 ```
 
 你现在已经有一些运行 R 代码的经验了。

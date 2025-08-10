@@ -1,7 +1,6 @@
 # Communicate {#sec-communicate-intro .unnumbered}
 
 ```{r}
-#| results: "asis"
 #| echo: false
 source("_common.R")
 ```

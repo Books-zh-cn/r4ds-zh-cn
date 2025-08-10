@@ -1,11 +1,8 @@
 # Data tidying {#sec-data-tidy}
 
 ```{r}
-#| results: "asis"
 #| echo: false
-
 source("_common.R")
-status("complete")
 ```
 
 ## Introduction
@@ -211,7 +208,8 @@ billboard |>
 行数现在少得多，表明许多具有 `NA`s 的行已被删除。
 
 您可能还想知道如果一首歌进入前 100 名超过 76 周会发生什么？
-我们无法从这些数据中看出，但您可能会猜测额外的列 `wk77`、`wk78`, ... 将添加到数据集中。
+我们无法从这些数据中看出，但您可能会猜测额外的列 `wk77`、`wk78`, ...
+将添加到数据集中。
 
 这些数据现在很整洁，但我们可以通过使用 `mutate()` 和 `readr::parse_number()` 将 `week` 值从字符串（character strings）转换为数字（numbers），从而使将来的计算变得更容易。
 `parse_number()` 是一个方便的函数，它将从字符串中提取第一个数字，忽略所有其他文本。

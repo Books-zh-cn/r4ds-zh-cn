@@ -22,7 +22,7 @@ Try to translate R for Data Science (the second edition) into Simplified Chinese
 | 7 Data import                    | ✔        | 2023.6.29 | [TigerZ](https://github.com/ZhengTiger) |
 | 8 Workflow: getting help         | ✔        | 2023.6.29 | [TigerZ](https://github.com/ZhengTiger) |
 | 9 Layers                         | ✔        | 2023.7.6  | [TigerZ](https://github.com/ZhengTiger) |
-| 10 Exploratory data analysis     |          |           |                                         |
+| 10 Exploratory data analysis     | ✔        | 2025.8.10 | [TigerZ](https://github.com/ZhengTiger) |
 | 11 Communication                 |          |           |                                         |
 | 12 Logical vectors               |          |           |                                         |
 | 13 Numbers                       |          |           |                                         |

@@ -1,11 +1,8 @@
 # Workflow: getting help {#sec-workflow-getting-help}
 
 ```{r}
-#| results: "asis"
 #| echo: false
-
 source("_common.R")
-status("complete")
 ```
 
 这本书不是一座孤岛；没有任何单一资源可以让您掌握 R。

@@ -1,10 +1,8 @@
 # Visualize {#sec-visualize .unnumbered}
 
 ```{r}
-#| results: "asis"
 #| echo: false
 source("_common.R")
-status("complete")
 ```
 
 阅读本书的第一部分后，您了解了（至少表面上）进行数据科学的最重要的工具。
