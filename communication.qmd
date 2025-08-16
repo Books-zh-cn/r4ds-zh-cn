@@ -7,27 +7,27 @@ source("_common.R")
 
 ## Introduction
 
-In @sec-exploratory-data-analysis, you learned how to use plots as tools for *exploration*.
-When you make exploratory plots, you know---even before looking---which variables the plot will display.
-You made each plot for a purpose, could quickly look at it, and then move on to the next plot.
-In the course of most analyses, you'll produce tens or hundreds of plots, most of which are immediately thrown away.
+在 @sec-exploratory-data-analysis 中，您学会了如何使用绘图作为探索工具。
+当您制作探索性绘图时，您甚至在查看之前就知道该图将显示的变量。
+您是出于目的制作每个绘图，可以快速查看它，然后转到下一个绘图。
+在大多数分析过程中，您会生产数十或数百个绘图，其中大多数立即被扔掉。
 
-Now that you understand your data, you need to *communicate* your understanding to others.
-Your audience will likely not share your background knowledge and will not be deeply invested in the data.
-To help others quickly build up a good mental model of the data, you will need to invest considerable effort in making your plots as self-explanatory as possible.
-In this chapter, you'll learn some of the tools that ggplot2 provides to do so.
+现在您了解了您的数据，您需要将您的理解传达给他人。
+您的听众可能不会分享您的背景知识，也不会在数据上投入大量投资。
+为了帮助他人迅速建立一个良好的心理模型，您将需要投入大量精力，以使图尽可能自我解释。
+在本章中，您将学习 ggplot2 提供的用来做这些的工具。
 
-This chapter focuses on the tools you need to create good graphics.
-We assume that you know what you want, and just need to know how to do it.
-For that reason, we highly recommend pairing this chapter with a good general visualization book.
-We particularly like [The Truthful Art](https://www.amazon.com/gp/product/0321934075/), by Albert Cairo.
-It doesn't teach the mechanics of creating visualizations, but instead focuses on what you need to think about in order to create effective graphics.
+本章重点介绍您创建良好图形所需的工具。
+我们假设您知道您想要什么，只需要知道如何做。
+因此，我们强烈建议将本章与一本良好的一般可视化书配对。
+我们特别喜欢 Albert Cairo 的 [The Truthful Art](https://www.amazon.com/gp/product/0321934075/)。
+它不会教导创建可视化的机制，而是专注于创建有效图形所需的考虑。
 
 ### Prerequisites
 
-In this chapter, we'll focus once again on ggplot2.
-We'll also use a little dplyr for data manipulation, **scales** to override the default breaks, labels, transformations and palettes, and a few ggplot2 extension packages, including **ggrepel** ([https://ggrepel.slowkow.com](https://ggrepel.slowkow.com/)) by Kamil Slowikowski and **patchwork** ([https://patchwork.data-imaginist.com](https://patchwork.data-imaginist.com/)) by Thomas Lin Pedersen.
-Don't forget that you'll need to install those packages with `install.packages()` if you don't already have them.
+在本章中，我们将再次关注 ggplot2。
+我们还将使用一些 **dplyr** 进行数据操作，**scales** 去覆盖默认 breaks，labels，transformations 和 palettes，以及一些 ggplot2 拓展包，包括 Kamil Slowikowski 的 **ggrepel** ([https://ggrepel.slowkow.com](https://ggrepel.slowkow.com/))，和 Thomas Lin Pedersen 的 **patchwork** ([https://patchwork.data-imaginist.com](https://patchwork.data-imaginist.com/))。
+不要忘记，如果您还没有安装它们，则需要使用 `install.packages()` 安装这些软件包。
 
 ```{r}
 #| label: setup
@@ -41,8 +41,8 @@ library(patchwork)
 
 ## Labels
 
-The easiest place to start when turning an exploratory graphic into an expository graphic is with good labels.
-You add labels with the `labs()` function.
+将探索性图形转换为说明性图形时，最简单的起点是具有良好的标签。
+您使用`labs()` 函数添加标签（labels）。
 
 ```{r}
 #| message: false
@@ -70,15 +70,15 @@ ggplot(mpg, aes(x = displ, y = hwy)) +
   )
 ```
 
-The purpose of a plot title is to summarize the main finding.
-Avoid titles that just describe what the plot is, e.g., "A scatterplot of engine displacement vs. fuel economy".
+绘图标题（`title`）的目的是总结主要发现。
+避免仅描述绘图的标题，例如 “A scatterplot of engine displacement vs. fuel economy”。
 
-If you need to add more text, there are two other useful labels: `subtitle` adds additional detail in a smaller font beneath the title and `caption` adds text at the bottom right of the plot, often used to describe the source of the data.
-You can also use `labs()` to replace the axis and legend titles.
-It's usually a good idea to replace short variable names with more detailed descriptions, and to include the units.
+如果您需要添加更多文本，则还有其他两个有用的标签：`subtitle` 在标题下方用较小的字体添加了其他细节，`caption` 在图的右下方添加了文本，通常用于描述数据来源。
+您还可以使用 `labs()` 替换 axis 和 legend titles。
+通常，用更详细的描述替换简短名称并包括单位是一个好主意。
 
-It's possible to use mathematical equations instead of text strings.
-Just switch `""` out for `quote()` and read about the available options in `?plotmath`:
+可以使用数学方程而不是文本字符串。
+只需切换 `""` 为 `quote()`，然后阅读 `?plotmath` 中的可用选项：
 
 ```{r}
 #| fig-asp: 1
@@ -103,10 +103,10 @@ ggplot(df, aes(x, y)) +
 
 ### Exercises
 
-1.  Create one plot on the fuel economy data with customized `title`, `subtitle`, `caption`, `x`, `y`, and `color` labels.
+1.  用自定义的 `title`，`subtitle`，`caption`，`x`，`y` 和 `color` 标签在 fuel economy data 上创建一个绘图。
 
-2.  Recreate the following plot using the fuel economy data.
-    Note that both the colors and shapes of points vary by type of drive train.
+2.  使用 fuel economy data 重新创建以下绘图。
+    请注意，点的颜色和形状因驱动列车类型而异。
 
     ```{r}
     #| echo: false
@@ -124,18 +124,18 @@ ggplot(df, aes(x, y)) +
       )
     ```
 
-3.  Take an exploratory graphic that you've created in the last month, and add informative titles to make it easier for others to understand.
+3.  探索您在上个月创建的图形，并添加内容丰富的标题，以使其他人更容易理解。
 
 ## Annotations
 
-In addition to labelling major components of your plot, it's often useful to label individual observations or groups of observations.
-The first tool you have at your disposal is `geom_text()`.
-`geom_text()` is similar to `geom_point()`, but it has an additional aesthetic: `label`.
-This makes it possible to add textual labels to your plots.
+除了标记图的主要组成部分外，它通常对标记单个观察结果或观察群也很有用。
+您可以使用的第一个工具是 `geom_text()`。
+`geom_text()` 类似于 `geom_point()`，但它具有额外的美学：`label`。
+这使得它可以在图中添加文本标签。
 
-There are two possible sources of labels.
-First, you might have a tibble that provides labels.
-In the following plot we pull out the cars with the highest engine size in each drive type and save their information as a new data frame called `label_info`.
+标签有两种可能的来源。
+首先，您可能有一个提供标签的 tibble 数据。
+在以下图中，我们拔出了每种驱动器类型中发动机尺寸最高的汽车，并将其信息保存为一个名为 `label_info` 的新数据框。
 
 ```{r}
 label_info <- mpg |>
@@ -154,10 +154,10 @@ label_info <- mpg |>
 label_info
 ```
 
-Then, we use this new data frame to directly label the three groups to replace the legend with labels placed directly on the plot.
-Using the `fontface` and `size` arguments we can customize the look of the text labels.
-They're larger than the rest of the text on the plot and bolded.
-(`theme(legend.position = "none"`) turns all the legends off --- we'll talk about it more shortly.)
+然后，我们使用此新数据框直接标记这三个组，以直接使用标签来替换图例。
+使 `fontface` 和 `size` 参数，我们可以自定义文本标签的外观。
+它们比绘图上的其余文本大。
+(`theme(legend.position = "none"`) 关闭所有图例 --- 我们将很快谈论它.)
 
 ```{r}
 #| fig-alt: |
@@ -176,11 +176,11 @@ ggplot(mpg, aes(x = displ, y = hwy, color = drv)) +
   theme(legend.position = "none")
 ```
 
-Note the use of `hjust` (horizontal justification) and `vjust` (vertical justification) to control the alignment of the label.
+请注意，使用 `hjust`（水平对齐）和 `vjust`（垂直对齐）来控制标签的对齐。
 
-However the annotated plot we made above is hard to read because the labels overlap with each other, and with the points.
-We can use the `geom_label_repel()` function from the ggrepel package to address both of these issues.
-This useful package will automatically adjust labels so that they don't overlap:
+但是，我们上面制作的带注释的图很难阅读，因为标签彼此重叠，并且与点重叠。
+我们可以使用 ggrepel 软件包中的 `geom_label_repel()` 函数来解决这两个问题。
+这个有用的软件包将自动调整标签，以免重叠：
 
 ```{r}
 #| fig-alt: |
@@ -200,8 +200,8 @@ ggplot(mpg, aes(x = displ, y = hwy, color = drv)) +
   theme(legend.position = "none")
 ```
 
-You can also use the same idea to highlight certain points on a plot with `geom_text_repel()` from the ggrepel package.
-Note another handy technique used here: we added a second layer of large, hollow points to further highlight the labelled points.
+您也可以使用相同的想法使用 ggrepel 软件包中的 `geom_text_repel()` 突出显示图上的某些点。
+请注意此处使用的另一种方便的技术：我们添加了第二层大的空心点，以进一步突出标记的点。
 
 ```{r}
 #| fig-alt: |
@@ -223,25 +223,25 @@ ggplot(mpg, aes(x = displ, y = hwy)) +
   )
 ```
 
-Remember, in addition to `geom_text()` and `geom_label()`, you have many other geoms in ggplot2 available to help annotate your plot.
-A couple ideas:
+请记住，除了 `geom_text()` 和 `geom_label()` 之外，您还可以在 ggplot2 中使用许多其他 geoms，以帮助您注释您的绘图。
+一些想法：
 
--   Use `geom_hline()` and `geom_vline()` to add reference lines.
-    We often make them thick (`linewidth = 2`) and white (`color = white`), and draw them underneath the primary data layer.
-    That makes them easy to see, without drawing attention away from the data.
+-   使用 `geom_hline()` 和 `geom_vline()` 添加参考线。
+    我们通常会使它们变厚（`linewidth = 2`）和变白色（`color = white`），然后将它们绘制在主要数据层下方。
+    这使得它们易于看到，而无需从数据中吸引注意力。
 
--   Use `geom_rect()` to draw a rectangle around points of interest.
-    The boundaries of the rectangle are defined by aesthetics `xmin`, `xmax`, `ymin`, `ymax`.
-    Alternatively, look into the [ggforce package](https://ggforce.data-imaginist.com/index.html), specifically [`geom_mark_hull()`](https://ggforce.data-imaginist.com/reference/geom_mark_hull.html), which allows you to annotate subsets of points with hulls.
+-   使用 `geom_rect()` 绘制围绕感兴趣点的矩形。
+    矩形的边界由美学 `xmin`, `xmax`, `ymin`, `ymax` 定义。
+    另外，请查看 [ggforce package](https://ggforce.data-imaginist.com/index.html) 软件包，特别是 [`geom_mark_hull()`](https://ggforce.data-imaginist.com/reference/geom_mark_hull.html)，它允许您用 hulls 注释点子集。
 
--   Use `geom_segment()` with the `arrow` argument to draw attention to a point with an arrow.
-    Use aesthetics `x` and `y` to define the starting location, and `xend` and `yend` to define the end location.
+-   将 `geom_segment()` 与 `arrow` 参数一起使用，将注意力吸引到用箭头的点上。
+    使用美学 `x` 和 `y` 来定义起始位置，然后 `xend` 和 `yend` 定义结束位置。
 
-Another handy function for adding annotations to plots is `annotate()`.
-As a rule of thumb, geoms are generally useful for highlighting a subset of the data while `annotate()` is useful for adding one or few annotation elements to a plot.
+向图添加注释的另一个方便函数是 `annotate()`。
+根据经验，geoms 通常对于突出数据子集很有用，而 `annotate()` 对于将一个或几个注释元素添加到图中很有用。
 
-To demonstrate using `annotate()`, let's create some text to add to our plot.
-The text is a bit long, so we'll use `stringr::str_wrap()` to automatically add line breaks to it given the number of characters you want per line:
+要演示使用 `annotate()`，让我们创建一些文本以添加到我们的图中。
+文本有点长，因此我们将使用 `stringr::str_wrap()` 自动添加换行，给定您每行所需的字符数：
 
 ```{r}
 trend_text <- "Larger engine sizes tend to have lower fuel economy." |>
@@ -249,9 +249,9 @@ trend_text <- "Larger engine sizes tend to have lower fuel economy." |>
 trend_text
 ```
 
-Then, we add two layers of annotation: one with a label geom and the other with a segment geom.
-The `x` and `y` aesthetics in both define where the annotation should start, and the `xend` and `yend` aesthetics in the segment annotation define the end location of the segment.
-Note also that the segment is styled as an arrow.
+然后，我们添加两个注释层：一个带有 label geom，另一个带有 segment geom。
+两者中的 `x` 和 `y` 美学都定义了注释应在哪里开始，并且 segment 注释中的 `xend` 和 `yend` 美学定义了该 segment 的最终位置。
+还请注意，segment 使用箭头风格。
 
 ```{r}
 #| fig-alt: |
@@ -274,36 +274,36 @@ ggplot(mpg, aes(x = displ, y = hwy)) +
   )
 ```
 
-Annotation is a powerful tool for communicating main takeaways and interesting features of your visualizations.
-The only limit is your imagination (and your patience with positioning annotations to be aesthetically pleasing)!
+注释是传达您的可视化主要要点和有趣功能的强大工具。
+唯一的限制是您的想象力（以及您对定位注释的耐心在美学上令人愉悦）！
 
 ### Exercises
 
-1.  Use `geom_text()` with infinite positions to place text at the four corners of the plot.
+1.  使用 `geom_text()` 及 infinite positions 将文本放在图的四个角落。
 
-2.  Use `annotate()` to add a point geom in the middle of your last plot without having to create a tibble.
-    Customize the shape, size, or color of the point.
+2.  使用 `annotate()` 在上一个图的中间添加 point geom，而无需创建 tibble。
+    自定义点的形状，大小或颜色。
 
-3.  How do labels with `geom_text()` interact with faceting?
-    How can you add a label to a single facet?
-    How can you put a different label in each facet?
-    (Hint: Think about the dataset that is being passed to `geom_text()`.)
+3.  `geom_text()` 的标签如何与 faceting 相互作用？
+    如何将标签添加到一个 facet？
+    您如何在每个 facet 放置不同的标签？
+    (提示：考虑要传递给 `geom_text()` 的数据集。)
 
-4.  What arguments to `geom_label()` control the appearance of the background box?
+4.  `geom_label()` 控制背景框外观的参数是什么？
 
-5.  What are the four arguments to `arrow()`?
-    How do they work?
-    Create a series of plots that demonstrate the most important options.
+5.  `arrow()` 的四个参数是什么？
+    他们如何工作？
+    创建一系列展示最重要选项的图。
 
 ## Scales
 
-The third way you can make your plot better for communication is to adjust the scales.
-Scales control how the aesthetic mappings manifest visually.
+您可以使绘图更好地进行交流的第三种方法是调整 scales。
+Scales 控制美学映射如何在视觉上表现出来。
 
 ### Default scales
 
-Normally, ggplot2 automatically adds scales for you.
-For example, when you type:
+通常， ggplot2 自动为您添加 scales。
+例如，当您输入时：
 
 ```{r}
 #| label: default-scales
@@ -313,7 +313,7 @@ ggplot(mpg, aes(x = displ, y = hwy)) +
   geom_point(aes(color = class))
 ```
 
-ggplot2 automatically adds default scales behind the scenes:
+ggplot2 自动在场景后面添加默认 scales：
 
 ```{r}
 #| fig-show: "hide"
@@ -325,29 +325,29 @@ ggplot(mpg, aes(x = displ, y = hwy)) +
   scale_color_discrete()
 ```
 
-Note the naming scheme for scales: `scale_` followed by the name of the aesthetic, then `_`, then the name of the scale.
-The default scales are named according to the type of variable they align with: continuous, discrete, datetime, or date.
-`scale_x_continuous()` puts the numeric values from `displ` on a continuous number line on the x-axis, `scale_color_discrete()` chooses colors for each of the `class` of car, etc.
-There are lots of non-default scales which you'll learn about below.
+请注意 scales 的命名方案：`scale_` 然后是美学的名称，然后是 `_`，然后是 scale 的名称。
+默认 scales 是根据与以下相符的变量类型命名的：continuous，discrete，datetime，date。
+`scale_x_continuous()` 将来自 `displ` 的数值显示在 x 轴的连续数字线上，`scale_color_discrete()` 为每种汽车类选择颜色，等。
+有很多非默认的 scales，您将在下面学习。
 
-The default scales have been carefully chosen to do a good job for a wide range of inputs.
-Nevertheless, you might want to override the defaults for two reasons:
+已经仔细选择了默认 scales，以便在各种输入中做得很好。
+但是，您可能需要覆盖默认值，原因有两个：
 
--   You might want to tweak some of the parameters of the default scale.
-    This allows you to do things like change the breaks on the axes, or the key labels on the legend.
+-   您可能需要调整默认 scale 的某些参数。
+    这使您可以执行诸如更改轴上的 breaks 或图例上的关键标签之类的事情。
 
--   You might want to replace the scale altogether, and use a completely different algorithm.
-    Often you can do better than the default because you know more about the data.
+-   您可能需要完全替换 scale，并使用完全不同的算法。
+    通常，您可以做得比默认值更好，因为您对数据有更多了解。
 
 ### Axis ticks and legend keys
 
-Collectively axes and legends are called **guides**.
-Axes are used for x and y aesthetics; legends are used for everything else.
+轴（axes）和图例（legends）统称为 **guides**。
+轴用于 x 和 y 美学；图例用于其他所有内容。
 
-There are two primary arguments that affect the appearance of the ticks on the axes and the keys on the legend: `breaks` and `labels`.
-Breaks controls the position of the ticks, or the values associated with the keys.
-Labels controls the text label associated with each tick/key.
-The most common use of `breaks` is to override the default choice:
+有两个主要参数会影响轴上 tick 的外观和图例中的 key：`breaks` 和 `labels`。
+`breaks` 控制 ticks 的位置或与 keys 关联的值。
+`labels` 控制与每个 tick/key 关联的文本标签。
+`breaks` 的最常见用途是覆盖默认选择：
 
 ```{r}
 #| fig-alt: |
@@ -360,10 +360,10 @@ ggplot(mpg, aes(x = displ, y = hwy, color = drv)) +
   scale_y_continuous(breaks = seq(15, 40, by = 5)) 
 ```
 
-You can use `labels` in the same way (a character vector the same length as `breaks`), but you can also set it to `NULL` to suppress the labels altogether.
-This can be useful for maps, or for publishing plots where you can't share the absolute numbers.
-You can also use `breaks` and `labels` to control the appearance of legends.
-For discrete scales for categorical variables, `labels` can be a named list of the existing levels names and the desired labels for them.
+您可以以相同的方式使用 `labels`（一个特征向量与 `breaks` 相同的长度），但是您也可以将其设置为 `NULL` 以完全抑制标签。
+这对于地图可能很有用，也可以发布您无法共享绝对数字的图。
+您还可以使用 `breaks` 和 `labels` 来控制图例的外观。
+对于分类变量的离散 scales，`labels` 可以是现有 levels 名称和所需标签的命名列表。
 
 ```{r}
 #| fig-alt: |
@@ -378,10 +378,10 @@ ggplot(mpg, aes(x = displ, y = hwy, color = drv)) +
   scale_color_discrete(labels = c("4" = "4-wheel", "f" = "front", "r" = "rear"))
 ```
 
-The `labels` argument coupled with labelling functions from the scales package is also useful for formatting numbers as currency, percent, etc.
-The plot on the left shows default labelling with `label_dollar()`, which adds a dollar sign as well as a thousand separator comma.
-The plot on the right adds further customization by dividing dollar values by 1,000 and adding a suffix "K" (for "thousands") as well as adding custom breaks.
-Note that `breaks` is in the original scale of the data.
+`labels` 参数以及来自 scales 软件包的标签函数也可用于格式化数字为货币，百分比等。
+左侧的绘图显示了带有 `label_dollar()` 的默认标签，该标签添加了一个美元符号以及一个千分位逗号。
+右侧的绘图进一步添加了自定义，通过将美元值除以 1,000 并添加后缀 “K”（用于“千”）并添加自定义 breaks。
+请注意，`breaks` 是数据的原始 scale。
 
 ```{r}
 #| layout-ncol: 2
@@ -407,7 +407,7 @@ ggplot(diamonds, aes(x = price, y = cut)) +
   )
 ```
 
-Another handy label function is `label_percent()`:
+另一个方便的标签函数是 `label_percent()`：
 
 ```{r}
 #| fig-alt: |
@@ -420,8 +420,8 @@ ggplot(diamonds, aes(x = cut, fill = clarity)) +
   scale_y_continuous(name = "Percentage", labels = label_percent())
 ```
 
-Another use of `breaks` is when you have relatively few data points and want to highlight exactly where the observations occur.
-For example, take this plot that shows when each US president started and ended their term.
+`breaks` 的另一个用途是，当您有相对较少的数据点并希望准确地突出观察结果时。
+例如，以这一绘图为例，显示了每位美国总统何时开始并结束任期。
 
 ```{r}
 #| fig-alt: |
@@ -438,21 +438,21 @@ presidential |>
   scale_x_date(name = NULL, breaks = presidential$start, date_labels = "'%y")
 ```
 
-Note that for the `breaks` argument we pulled out the `start` variable as a vector with `presidential$start` because we can't do an aesthetic mapping for this argument.
-Also note that the specification of breaks and labels for date and datetime scales is a little different:
+请注意，对于 `breaks` 参数，我们将 `start` 变量替换为 `presidential$start` 向量，是因为我们无法为此参数进行美学映射。
+另请注意，date 和 datetime scales 的 breaks 和 labels 的规范有些不同：
 
--   `date_labels` takes a format specification, in the same form as `parse_datetime()`.
+-   `date_labels` 采用与 `parse_datetime()` 形式相同的格式规范。
 
--   `date_breaks` (not shown here), takes a string like "2 days" or "1 month".
+-   `date_breaks`（此处未显示），使用 "2 days" 或 "1 month" 之类的字符串。
 
 ### Legend layout
 
-You will most often use `breaks` and `labels` to tweak the axes.
-While they both also work for legends, there are a few other techniques you are more likely to use.
+您通常会使用 `breaks` 和 `labels` 来调整轴。
+尽管它们也都为图例工作，但您更有可能使用其他一些技术。
 
-To control the overall position of the legend, you need to use a `theme()` setting.
-We'll come back to themes at the end of the chapter, but in brief, they control the non-data parts of the plot.
-The theme setting `legend.position` controls where the legend is drawn:
+为了控制图例的整体位置，您需要使用 `theme()` 设置。
+我们将在本章末尾回到 themes，但简而言之，它们控制着绘图的非数据部分。
+theme 设置 `legend.position` 控制绘制图例的位置：
 
 ```{r}
 #| layout-ncol: 2
@@ -475,12 +475,12 @@ base +
   guides(color = guide_legend(nrow = 3))
 ```
 
-If your plot is short and wide, place the legend at the legend at the top or bottom, and if it's tall and narrow, place the legend at the left or right.
-You can also use `legend.position = "none"` to suppress the display of the legend altogether.
+如果您的绘图短而宽，则将图例放在顶部或底部，如果它高而窄，则将图例放在左或右侧。
+您也可以使用 `legend.position = "none"` 来抑制图例的显示。
 
-To control the display of individual legends, use `guides()` along with `guide_legend()` or `guide_colorbar()`.
-The following example shows two important settings: controlling the number of rows the legend uses with `nrow`, and overriding one of the aesthetics to make the points bigger.
-This is particularly useful if you have used a low `alpha` to display many points on a plot.
+要控制单个图例的显示，请与 `guides()` 一起使用 `guide_legend()` 或 `guide_colorbar()`。
+下面的示例显示了两个重要的设置：使用 `nrow` 控制图例的行数，使用 `override.aes` 覆盖一种美学以使点更大。
+如果您使用低 `alpha` 在图上显示许多点，这将特别有用。
 
 ```{r}
 #| fig-alt: |
@@ -497,16 +497,16 @@ ggplot(mpg, aes(x = displ, y = hwy)) +
   guides(color = guide_legend(nrow = 2, override.aes = list(size = 4)))
 ```
 
-Note that the name of the argument in `guides()` matches the name of the aesthetic, just like in `labs()`.
+请注意，`guides()` 中参数的名称匹配美学的名称，就像 `labs()` 中一样。
 
 ### Replacing a scale
 
-Instead of just tweaking the details a little, you can instead replace the scale altogether.
-There are two types of scales you're mostly likely to want to switch out: continuous position scales and color scales.
-Fortunately, the same principles apply to all the other aesthetics, so once you've mastered position and color, you'll be able to quickly pick up other scale replacements.
+您不仅可以对细节进行一些调整，还可以完全替换 scale。
+您大多有可能要切换两种类型的 scales：连续位置 scales 和颜色 scales。
+幸运的是，相同的原则适用于所有其他美学，因此，一旦掌握了位置和颜色，您就可以快速拿起其他 scale 替代品。
 
-It's very useful to plot transformations of your variable.
-For example, it's easier to see the precise relationship between `carat` and `price` if we log transform them:
+绘制变量的转换非常有用。
+例如，如果我们 log 转换它们，则更容易看到 `carat` 和 `price` 之间的确切关系：
 
 ```{r}
 #| fig-align: default
@@ -527,9 +527,9 @@ ggplot(diamonds, aes(x = log10(carat), y = log10(price))) +
   geom_bin2d()
 ```
 
-However, the disadvantage of this transformation is that the axes are now labelled with the transformed values, making it hard to interpret the plot.
-Instead of doing the transformation in the aesthetic mapping, we can instead do it with the scale.
-This is visually identical, except the axes are labelled on the original data scale.
+但是，这种转换的缺点是轴现在用转换值标记，因此很难解释图。
+与其在美学映射中进行转换，我们可以用 scale 来进行。
+这在视觉上是相同的，除了轴以原始数据 scale 标记。
 
 ```{r}
 #| fig-alt: |
@@ -543,12 +543,12 @@ ggplot(diamonds, aes(x = carat, y = price)) +
   scale_y_log10()
 ```
 
-Another scale that is frequently customized is color.
-The default categorical scale picks colors that are evenly spaced around the color wheel.
-Useful alternatives are the ColorBrewer scales which have been hand tuned to work better for people with common types of color blindness.
-The two plots below look similar, but there is enough difference in the shades of red and green that the dots on the right can be distinguished even by people with red-green color blindness.[^communication-1]
+经常自定义的另一个 scale 是 color。
+默认的分类 scale 挑选围绕色轮均匀间隔的颜色。
+有用的替代方法是手工调整的 ColorBrewer scales，可以为具有常见的色盲类型的人提供更好的工作。
+下面的两个图看起来相似，但是红色和绿色的阴影有足够的差异，即使有红绿色盲的人也可以区分右边的点。[^communication-1]
 
-[^communication-1]: You can use a tool like [SimDaltonism](https://michelf.ca/projects/sim-daltonism/) to simulate color blindness to test these images.
+[^communication-1]: 您可以使用 [SimDaltonism](https://michelf.ca/projects/sim-daltonism/) 之类的工具模拟色盲来测试这些图像。
 
 ```{r}
 #| fig-align: default
@@ -568,9 +568,9 @@ ggplot(mpg, aes(x = displ, y = hwy)) +
   scale_color_brewer(palette = "Set1")
 ```
 
-Don't forget simpler techniques for improving accessibility.
-If there are just a few colors, you can add a redundant shape mapping.
-This will also help ensure your plot is interpretable in black and white.
+不要忘记改善可访问性的简单技术。
+如果只有几种颜色，则可以添加冗余形状映射。
+这也将有助于确保您的绘图在黑白中可以解释。
 
 ```{r}
 #| fig-alt: |
@@ -583,10 +583,10 @@ ggplot(mpg, aes(x = displ, y = hwy)) +
   scale_color_brewer(palette = "Set1")
 ```
 
-The ColorBrewer scales are documented online at <https://colorbrewer2.org/> and made available in R via the **RColorBrewer** package, by Erich Neuwirth.
-@fig-brewer shows the complete list of all palettes.
-The sequential (top) and diverging (bottom) palettes are particularly useful if your categorical values are ordered, or have a "middle".
-This often arises if you've used `cut()` to make a continuous variable into a categorical variable.
+ColorBrewer scales 在 <https://colorbrewer2.org/> 上在线记录，并通过 Erich Neuwirth 的 **RColorBrewer** 软件包在 R 中提供。
+@fig-brewer 显示了所有调色板的完整列表。
+连续（顶部）和离散（底部）调色板特别有用，如果您的分类值被排序或具有“中间”值。
+这通常会出现在如果您使用 `cut()` 将连续变量变成一个分类变量。
 
 ```{r}
 #| label: fig-brewer
@@ -603,9 +603,9 @@ par(mar = c(0, 3, 0, 0))
 RColorBrewer::display.brewer.all()
 ```
 
-When you have a predefined mapping between values and colors, use `scale_color_manual()`.
-For example, if we map presidential party to color, we want to use the standard mapping of red for Republicans and blue for Democrats.
-One approach for assigning these colors is using hex color codes:
+当您在值和颜色之间具有预定义的映射时，请使用 `scale_color_manual()`。
+例如，如果我们将 presidential party 映射给 color，我们希望将红色的标准映射用于 Republicans 和蓝色用于 Democrats。
+分配这些颜色的一种方法是使用 hex 颜色代码：
 
 ```{r}
 #| fig-alt: |
@@ -622,14 +622,14 @@ presidential |>
   scale_color_manual(values = c(Republican = "#E81B23", Democratic = "#00AEF3"))
 ```
 
-For continuous color, you can use the built-in `scale_color_gradient()` or `scale_fill_gradient()`.
-If you have a diverging scale, you can use `scale_color_gradient2()`.
-That allows you to give, for example, positive and negative values different colors.
-That's sometimes also useful if you want to distinguish points above or below the mean.
+对于连续颜色，您可以使用内置 `scale_color_gradient()` 或 `scale_fill_gradient()`。
+如果您有一个 diverging scale，则可以使用 `scale_color_gradient2()`。
+这使您可以给出例如正值和负值不同的颜色。
+如果您想区分均值以上或以下的点时，这也很有用。
 
-Another option is to use the viridis color scales.
-The designers, Nathaniel Smith and Stéfan van der Walt, carefully tailored continuous color schemes that are perceptible to people with various forms of color blindness as well as perceptually uniform in both color and black and white.
-These scales are available as continuous (`c`), discrete (`d`), and binned (`b`) palettes in ggplot2.
+另一个选择是使用 viridis color scales。
+设计师 Nathaniel Smith 和 Stéfan van der Walt 精心量身定制的连续配色方案，这些配色方案对各种形式的色盲以及颜色和黑色和白色的感知均匀的人都可以感知。
+这些 scales 可作为连续（continuous，`c`），离散（discrete，`d`）和 ggplot2 中的 binned（`b`）调色板提供。
 
 ```{r}
 #| fig-align: default
@@ -665,20 +665,20 @@ ggplot(df, aes(x, y)) +
   labs(title = "Viridis, binned", x = NULL, y = NULL)
 ```
 
-Note that all color scales come in two varieties: `scale_color_*()` and `scale_fill_*()` for the `color` and `fill` aesthetics respectively (the color scales are available in both UK and US spellings).
+请注意，所有颜色 scales 都有两个类型：`scale_color_*()` 和 `scale_fill_*()` 分别用于 `color` 和 `fill` 美学（英式和英式拼写都可以使用 color scales）。
 
 ### Zooming
 
-There are three ways to control the plot limits:
+有三种控制图限制（limits）的方法：
 
-1.  Adjusting what data are plotted.
-2.  Setting the limits in each scale.
-3.  Setting `xlim` and `ylim` in `coord_cartesian()`.
+1.  调整绘制哪些数据。
+2.  在每个 scale 中设置 limits。
+3.  在 `coord_cartesian()` 中设置 `xlim` 和 `ylim`。
 
-We'll demonstrate these options in a series of plots.
-The plot on the left shows the relationship between engine size and fuel efficiency, colored by type of drive train.
-The plot on the right shows the same variables, but subsets the data that are plotted.
-Subsetting the data has affected the x and y scales as well as the smooth curve.
+我们将在一系列绘图中演示这些选项。
+左侧的绘图显示了发动机尺寸和燃油效率之间的关系，并通过驱动器类型进行着色。
+右侧的图显示了相同的变量，但是用子集绘制的数据。
+子集数据影响了 x 和 y scales 以及平滑曲线。
 
 ```{r}
 #| layout-ncol: 2
@@ -705,9 +705,9 @@ mpg |>
   geom_smooth()
 ```
 
-Let's compare these to the two plots below where the plot on the left sets the `limits` on individual scales and the plot on the right sets them in `coord_cartesian()`.
-We can see that reducing the limits is equivalent to subsetting the data.
-Therefore, to zoom in on a region of the plot, it's generally best to use `coord_cartesian()`.
+让我们将它们与下面的两个图进行比较，其中左侧的绘图设置了单个 scales 上的 `limits`，右侧的绘图在 `coord_cartesian()` 中设置它们。
+我们可以看到，降低 limits 等效于子集。
+因此，要放大图块的区域，通常最好使用 `coord_cartesian()`。
 
 ```{r}
 #| layout-ncol: 2
@@ -736,8 +736,8 @@ ggplot(mpg, aes(x = displ, y = hwy)) +
   coord_cartesian(xlim = c(5, 6), ylim = c(10, 25))
 ```
 
-On the other hand, setting the `limits` on individual scales is generally more useful if you want to *expand* the limits, e.g., to match scales across different plots.
-For example, if we extract two classes of cars and plot them separately, it's difficult to compare the plots because all three scales (the x-axis, the y-axis, and the color aesthetic) have different ranges.
+另一方面，如果要扩大 limits，例如，以匹配不同图的尺度，则通常在单个 scales 上设置 `limits` 通常更有用。
+例如，如果我们提取两类汽车并分别绘制它们，则很难比较绘图，因为所有三个 scales（x-axis，y-axis，color aesthetic）都有不同的范围。
 
 ```{r}
 #| layout-ncol: 2
@@ -764,7 +764,7 @@ ggplot(compact, aes(x = displ, y = hwy, color = drv)) +
   geom_point()
 ```
 
-One way to overcome this problem is to share scales across multiple plots, training the scales with the `limits` of the full data.
+克服此问题的一种方法是在多个图上共享 scales，并使用完整数据的 `limits` 训练 scales。
 
 ```{r}
 #| layout-ncol: 2
@@ -799,11 +799,11 @@ ggplot(compact, aes(x = displ, y = hwy, color = drv)) +
   col_scale
 ```
 
-In this particular case, you could have simply used faceting, but this technique is useful more generally, if for instance, you want to spread plots over multiple pages of a report.
+在这种特殊情况下，您可以简单地使用 faceting，但是此技术更普遍地有用，例如，如果您想在报告的多个页面上传播 绘图。
 
 ### Exercises
 
-1.  Why doesn't the following code override the default scale?
+1.  为什么以下代码不覆盖默认 scale？
 
     ```{r}
     #| fig-show: "hide"
@@ -819,19 +819,19 @@ In this particular case, you could have simply used faceting, but this technique
       coord_fixed()
     ```
 
-2.  What is the first argument to every scale?
-    How does it compare to `labs()`?
+2.  每个 scale 的第一个参数是什么？
+    与 `labs()` 相比如何？
 
-3.  Change the display of the presidential terms by:
+3.  通过以下方式更改 presidential terms 的显示
 
-    a.  Combining the two variants that customize colors and x axis breaks.
-    b.  Improving the display of the y axis.
-    c.  Labelling each term with the name of the president.
-    d.  Adding informative plot labels.
-    e.  Placing breaks every 4 years (this is trickier than it seems!).
+    a.  结合自定义 colors 和 x 轴 breaks 这两个变量。
+    b.  改善 y 轴的显示。
+    c.  将每个 term 标记为总统的名字。
+    d.  添加内容丰富的绘图标签。
+    e.  替换 breaks 为每 4 年（这比看起来更棘手！）。
 
-4.  First, create the following plot.
-    Then, modify the code using `override.aes` to make the legend easier to see.
+4.  首先，创建以下图。
+    然后，使用 `override.aes` 修改代码，以使图例更容易看到。
 
     ```{r}
     #| fig-show: hide
@@ -842,7 +842,7 @@ In this particular case, you could have simply used faceting, but this technique
 
 ## Themes {#sec-themes}
 
-Finally, you can customize the non-data elements of your plot with a theme:
+最后，您可以用主题自定义绘图的非数据元素：
 
 ```{r}
 #| message: false
@@ -856,15 +856,15 @@ ggplot(mpg, aes(x = displ, y = hwy)) +
   theme_bw()
 ```
 
-ggplot2 includes the eight themes shown in @fig-themes, with `theme_gray()` as the default.[^communication-2]
-Many more are included in add-on packages like **ggthemes** (<https://jrnold.github.io/ggthemes>), by Jeffrey Arnold.
-You can also create your own themes, if you are trying to match a particular corporate or journal style.
+ggplot2 包括 @fig-themes 中所示的八个主题，`theme_gray()` 作为默认值。[^communication-2]
+诸如 Jeffrey Arnold 的 **ggthemes** (<https://jrnold.github.io/ggthemes>) 之类的附加软件包中包含了更多主题。
+您也可以创建自己的主题，如果您要匹配特定的公司或期刊样式。
 
-[^communication-2]: Many people wonder why the default theme has a gray background.
-    This was a deliberate choice because it puts the data forward while still making the grid lines visible.
-    The white grid lines are visible (which is important because they significantly aid position judgments), but they have little visual impact and we can easily tune them out.
-    The gray background gives the plot a similar typographic color to the text, ensuring that the graphics fit in with the flow of a document without jumping out with a bright white background.
-    Finally, the gray background creates a continuous field of color which ensures that the plot is perceived as a single visual entity.
+[^communication-2]: 许多人想知道为什么默认主题具有灰色背景。
+    这是一个故意的选择，因为它可以将数据传递到同时使网格线可见。
+    白色网格线是可见的（这很重要，因为它们可以大大帮助位置判断），但是它们的视觉影响很小，我们可以轻松地将它们调出。
+    灰色背景使绘图与文本具有类似的印刷色彩，从而确保图形与文档的流程符合文档的流程，而不会以明亮的白色背景跳出。
+    最后，灰色背景创建了一个连续的颜色字段，可确保图被视为单个视觉实体。
 
 ```{r}
 #| label: fig-themes
@@ -885,15 +885,15 @@ You can also create your own themes, if you are trying to match a particular cor
 knitr::include_graphics("images/visualization-themes.png")
 ```
 
-It's also possible to control individual components of each theme, like the size and color of the font used for the y axis.
-We've already seen that `legend.position` controls where the legend is drawn.
-There are many other aspects of the legend that can be customized with `theme()`.
-For example, in the plot below we change the direction of the legend as well as put a black border around it.
-Note that customization of the legend box and plot title elements of the theme are done with `element_*()` functions.
-These functions specify the styling of non-data components, e.g., the title text is bolded in the `face` argument of `element_text()` and the legend border color is defined in the `color` argument of `element_rect()`.
-The theme elements that control the position of the title and the caption are `plot.title.position` and `plot.caption.position`, respectively.
-In the following plot these are set to `"plot"` to indicate these elements are aligned to the entire plot area, instead of the plot panel (the default).
-A few other helpful `theme()` components are used to change the placement for format of the title and caption text.
+也可以控制每个主题的各个组件，例如用于 y 轴的字体的大小和颜色。
+我们已经看到了 `legend.position` 控制图例的绘制位置。
+图例中还有许多其他方面可以通过 `theme()` 自定义。
+例如，在下面的绘图中，我们改变了图例的方向，并在其周围放置了一个黑色边框。
+请注意，通过 `element_*()` 函数，自定义图例框和主题的图标题元素。
+这些函数指定了非数据组件的样式，例如，标题文本在 `element_text()` 的 `face` 参数中被加粗，而图例边框颜色 `element_rect()` 的 `color` 参数中定义。
+控制 title 和 caption 位置的主题元素分别为 `plot.title.position` 和 `plot.caption.position`。
+在以下图中，这些设置为 `"plot"`，以指示这些元素与整个绘图区域对齐，而不是绘图面板（默认值）。
+其他一些有用的 `theme()` 组件用于更改 title 和 caption 文本格式的位置。
 
 ```{r}
 #| fig-alt: |
@@ -920,24 +920,24 @@ ggplot(mpg, aes(x = displ, y = hwy, color = drv)) +
   )
 ```
 
-For an overview of all `theme()` components, see help with `?theme`.
-The [ggplot2 book](https://ggplot2-book.org/) is also a great place to go for the full details on theming.
+有关所有 `theme()` 组件的概述，请参见 `?theme`。
+[ggplot2 book](https://ggplot2-book.org/) 也是有关主题的全部详细信息的好地方。
 
 ### Exercises
 
-1.  Pick a theme offered by the ggthemes package and apply it to the last plot you made.
-2.  Make the axis labels of your plot blue and bolded.
+1.  选择 ggthemes 软件包提供的主题，并将其应用于您制作的最后一个绘图。
+2.  使绘图的轴标签为蓝色和粗体。
 
 ## Layout
 
-So far we talked about how to create and modify a single plot.
-What if you have multiple plots you want to lay out in a certain way?
-The patchwork package allows you to combine separate plots into the same graphic.
-We loaded this package earlier in the chapter.
+到目前为止，我们讨论了如何创建和修改单个图。
+如果您想以某种方式布置多个图怎么办？
+patchwork 软件包允许您将单独的图组合到同一图形中。
+我们在本章的早期加载了此软件包。
 
-To place two plots next to each other, you can simply add them to each other.
-Note that you first need to create the plots and save them as objects (in the following example they're called `p1` and `p2`).
-Then, you place them next to each other with `+`.
+要彼此放置两个绘图，您只需将它们互相添加。
+请注意，您首先需要创建图并将其保存为对象（在下面的示例中，它们称为 `p1` 和 `p2`）。
+然后，你放置它们彼此相邻通过 `+`。
 
 ```{r}
 #| fig-width: 6
@@ -956,11 +956,11 @@ p2 <- ggplot(mpg, aes(x = drv, y = hwy)) +
 p1 + p2
 ```
 
-It's important to note that in the above code chunk we did not use a new function from the patchwork package.
-Instead, the package added a new functionality to the `+` operator.
+重要的是要注意，在上面的代码块中，我们没有使用 patchwork 软件包中的新函数。
+相反，软件包向 `+` 运算符添加了新功能。
 
-You can also create complex plot layouts with patchwork.
-In the following, `|` places the `p1` and `p3` next to each other and `/` moves `p2` to the next line.
+您还可以使用 patchwork 创建复杂的绘图布局。
+在下面，`|` 将 `p1` 和 `p3` 彼此相邻，`/` 将 `p2` 移至下一行。
 
 ```{r}
 #| fig-width: 6
@@ -979,14 +979,14 @@ p3 <- ggplot(mpg, aes(x = cty, y = hwy)) +
 (p1 | p3) / p2
 ```
 
-Additionally, patchwork allows you to collect legends from multiple plots into one common legend, customize the placement of the legend as well as dimensions of the plots, and add a common title, subtitle, caption, etc. to your plots.
-Below we create 5 plots.
-We have turned off the legends on the box plots and the scatterplot and collected the legends for the density plots at the top of the plot with `& theme(legend.position = "top")`.
-Note the use of the `&` operator here instead of the usual `+`.
-This is because we're modifying the theme for the patchwork plot as opposed to the individual ggplots.
-The legend is placed on top, inside the `guide_area()`.
-Finally, we have also customized the heights of the various components of our patchwork -- the guide has a height of 1, the box plots 3, density plots 2, and the faceted scatterplot 4.
-Patchwork divides up the area you have allotted for your plot using this scale and places the components accordingly.
+此外，patchwork 允许您从多个绘图中收集图例为一个通用图例，并自定义图例的位置以及图的尺寸，并在图中添加一个通用 title，subtitle，caption 等。
+下面我们创建5个图。
+我们已经关闭了 box plots 和 scatterplot 上的图例，并通过 `& theme(legend.position = "top")` 收集了 density plots 的图例绘制在顶部。
+请注意，这里的使用 `&` 运算符而不是通常的 `+`。
+这是因为我们正在修改 patchwork 图的主题，而不是单个 ggplots。
+图例放在 `guide_area()` 内部的顶部。
+最后，我们还定制了 patchwork 的各个组件的高度 -- guide 的高度为 1，box plots 为 3，density plots 为 2，faceted scatterplot 为 4。
+Patchwork 将您分配给绘图的区域，并使用此刻度分配了您的绘图区域，并将组件放置相应地放置。
 
 ```{r}
 #| fig-width: 8
@@ -1034,12 +1034,12 @@ p5 <- ggplot(mpg, aes(x = cty, y = hwy, color = drv)) +
   theme(legend.position = "top")
 ```
 
-If you'd like to learn more about combining and layout out multiple plots with patchwork, we recommend looking through the guides on the package website: <https://patchwork.data-imaginist.com>.
+如果您想了解有关将多个图与 patchwork 相结合和布局的更多信息，我们建议您在软件包网站上查看指南：<https://patchwork.data-imaginist.com>。
 
 ### Exercises
 
-1.  What happens if you omit the parentheses in the following plot layout.
-    Can you explain why this happens?
+1.  如果您在以下绘图布局中省略括号，会发生什么。
+    您能解释一下为什么会发生这种情况吗？
 
     ```{r}
     #| fig-show: hide
@@ -1057,7 +1057,7 @@ If you'd like to learn more about combining and layout out multiple plots with p
     (p1 | p2) / p3
     ```
 
-2.  Using the three plots from the previous exercise, recreate the following patchwork.
+2.  使用上一个练习中的三个图，重新创建以下拼布。
 
     ```{r}
     #| fig-width: 7
@@ -1081,9 +1081,9 @@ If you'd like to learn more about combining and layout out multiple plots with p
 
 ## Summary
 
-In this chapter you've learned about adding plot labels such as title, subtitle, caption as well as modifying default axis labels, using annotation to add informational text to your plot or to highlight specific data points, customizing the axis scales, and changing the theme of your plot.
-You've also learned about combining multiple plots in a single graph using both simple and complex plot layouts.
+在本章中，您已经了解了添加图标签，例如 title，subtitle，caption 以及修改默认轴标签，使用注释将信息文本添加到图中或突出显示特定的数据点，自定义轴 scales 以及更改图的主题。
+您还了解了使用简单和复杂的绘图布局在单个图中组合多个图。
 
-While you've so far learned about how to make many different types of plots and how to customize them using a variety of techniques, we've barely scratched the surface of what you can create with ggplot2.
-If you want to get a comprehensive understanding of ggplot2, we recommend reading the book, [*ggplot2: Elegant Graphics for Data Analysis*](https://ggplot2-book.org).
-Other useful resources are the [*R Graphics Cookbook*](https://r-graphics.org) by Winston Chang and [*Fundamentals of Data Visualization*](https://clauswilke.com/dataviz/) by Claus Wilke.
+到目前为止，您已经了解了如何制作多种不同类型的图以及如何使用各种技术自定义它们，但我们对 ggplot2 的介绍仅停留在表面。
+如果您想对 ggplot2 有全面的了解，我们建议阅读 [*ggplot2: Elegant Graphics for Data Analysis*](https://ggplot2-book.org)。
+其他有用的资源是 Winston Chang 的 [*R Graphics Cookbook*](https://r-graphics.org) 和 Claus Wilke 的 [*Fundamentals of Data Visualization*](https://clauswilke.com/dataviz/)。
