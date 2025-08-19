@@ -24,7 +24,7 @@ Try to translate R for Data Science (the second edition) into Simplified Chinese
 | 9 Layers                         | ✔        | 2023.7.6  | [TigerZ](https://github.com/ZhengTiger) |
 | 10 Exploratory data analysis     | ✔        | 2025.8.10 | [TigerZ](https://github.com/ZhengTiger) |
 | 11 Communication                 | ✔        | 2025.8.16 | [TigerZ](https://github.com/ZhengTiger) |
-| 12 Logical vectors               |          |           |                                         |
+| 12 Logical vectors               | ✔        | 2025.8.19 | [TigerZ](https://github.com/ZhengTiger) |
 | 13 Numbers                       |          |           |                                         |
 | 14 Strings                       |          |           |                                         |
 | 15 Regular expressions           |          |           |                                         |

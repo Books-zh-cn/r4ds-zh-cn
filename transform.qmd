@@ -5,15 +5,14 @@
 source("_common.R")
 ```
 
-The second part of the book was a deep dive into data visualization.
-In this part of the book, you'll learn about the most important types of variables that you'll encounter inside a data frame and learn the tools you can use to work with them.
+本书的第二部分是深入研究数据可视化。
+在本书的这一部分中，您将了解您在数据框架内遇到的最重要类型的变量类型，并学习可以使用的工具与它们使用。
 
 ```{r}
 #| label: fig-ds-transform
 #| echo: false
 #| fig-cap: |
-#|   The options for data transformation depends heavily on the type of 
-#|   data involved, the subject of this part of the book.
+#|   数据转换的选项在很大程度上取决于所涉及的数据类型，这是本书的这一部分的主题。
 #| fig-alt: |
 #|   Our data science model, with transform highlighted in blue.
 #| out.width: NULL
@@ -21,29 +20,29 @@ In this part of the book, you'll learn about the most important types of variabl
 knitr::include_graphics("diagrams/data-science/transform.png", dpi = 270)
 ```
 
-You can read these chapters as you need them; they're designed to be largely standalone so that they can be read out of order.
+您可以根据需要阅读这些章节；它们的设计基本上是独一无二的，以便可以逐步阅读它们。
 
--   @sec-logicals teaches you about logical vectors.
-    These are the simplest types of vectors, but are extremely powerful.
-    You'll learn how to create them with numeric comparisons, how to combine them with Boolean algebra, how to use them in summaries, and how to use them for condition transformations.
+-   @sec-logicals 教您逻辑向量。
+    这些是最简单的矢量类型，但非常强大。
+    您将学习如何通过数字比较，如何将它们与布尔代数相结合，如何在摘要中使用它们以及如何将它们用于条件转换。
 
--   @sec-numbers dives into tools for vectors of numbers, the powerhouse of data science.
-    You'll learn more about counting and a bunch of important transformation and summary functions.
+-   @sec-numbers 深入探讨数值向量的处理工具，这些工具是数据科学的动力源泉。
+    你将进一步学习计数方法，以及一系列重要的转换与汇总函数。
 
--   @sec-strings will give you the tools to work with strings: you'll slice them, you'll dice them, and you'll stick them back together again.
-    This chapter mostly focuses on the stringr package, but you'll also learn some more tidyr functions devoted to extracting data from character strings.
+-   @sec-strings 将赋予你处理文本的工具：拆分字符串、精细切割、再重新拼接。
+    本章重点介绍 stringr 包，同时也会学习更多 tidyr 包中专用于字符串数据提取的函数。
 
--   @sec-regular-expressions introduces you to regular expressions, a powerful tool for manipulating strings.
-    This chapter will take you from thinking that a cat walked over your keyboard to reading and writing complex string patterns.
+-   @sec-regular-expressions 将带你认识这个强大的字符串处理工具。
+    从面对混乱字符时的茫然，到能读写复杂字符串模式，本章将完成你的蜕变。
 
--   @sec-factors introduces factors: the data type that R uses to store categorical data.
-    You use a factor when variable has a fixed set of possible values, or when you want to use a non-alphabetical ordering of a string.
+-   @sec-factors 介绍因子: R 语言存储分类数据的数据类型。
+    当变量具有固定取值范围时，或需要非字母顺序的字符串排列时，因子便是你的利器。
 
--   @sec-dates-and-times will give you the key tools for working with dates and date-times.
-    Unfortunately, the more you learn about date-times, the more complicated they seem to get, but with the help of the lubridate package, you'll learn to how to overcome the most common challenges.
+-   @sec-dates-and-times 提供处理日期和时间的关键工具。
+    虽然日期时间越学越显复杂，但借助 lubridate 包，你将掌握应对常见挑战的方法。
 
--   @sec-missing-values discusses missing values in depth.
-    We've discussed them a couple of times in isolation, but now it's time to discuss them holistically, helping you come to grips with the difference between implicit and explicit missing values, and how and why you might convert between them.
+-   @sec-missing-values 深度探讨缺失值问题。
+    虽然之前零散提及过，但现在是系统讨论的时候了，帮助你理解显式与隐式缺失值的区别，以及转换方式和意义。
 
--   @sec-joins finishes up this part of the book by giving you tools to join two (or more) data frames together.
-    Learning about joins will force you to grapple with the idea of keys, and think about how you identify each row in a dataset.
+-   @sec-joins 作为本部分的收官之作，将教你合并多个数据框的工具。
+    学习连接操作会让你深入理解键的概念，并思考如何唯一标识数据集中的每一行。
