@@ -26,7 +26,7 @@ Try to translate R for Data Science (the second edition) into Simplified Chinese
 | 11 Communication                 | ✔        | 2025.8.16 | [TigerZ](https://github.com/ZhengTiger) |
 | 12 Logical vectors               | ✔        | 2025.8.19 | [TigerZ](https://github.com/ZhengTiger) |
 | 13 Numbers                       | ✔        | 2025.8.28 | [TigerZ](https://github.com/ZhengTiger) |
-| 14 Strings                       |          |           |                                         |
+| 14 Strings                       | ✔        | 2025.9.1  | [TigerZ](https://github.com/ZhengTiger) |
 | 15 Regular expressions           |          |           |                                         |
 | 16 Factors                       |          |           |                                         |
 | 17 Dates and times               |          |           |                                         |
