@@ -7,20 +7,20 @@ source("_common.R")
 
 ## Introduction
 
-In @sec-strings, you learned a whole bunch of useful functions for working with strings.
-This chapter will focus on functions that use **regular expressions**, a concise and powerful language for describing patterns within strings.
-The term "regular expression" is a bit of a mouthful, so most people abbreviate it to "regex"[^regexps-1] or "regexp".
+在\@sec-strings中，你学习了许多处理字符串的实用函数。
+本章将重点介绍使用**正则表达式(regular expressions)**的函数，这是一种用于描述字符串模式的简洁而强大的语言。
+术语“regular expression”有些拗口，因此大多数人将其简称为“regex”[^regexps-1]或“regexp”。
 
-[^regexps-1]: You can pronounce it with either a hard-g (reg-x) or a soft-g (rej-x).
+[^regexps-1]: 您可以使用 hard-g (reg-x) 或 soft-g (rej-x) 来发音。
 
-The chapter starts with the basics of regular expressions and the most useful stringr functions for data analysis.
-We'll then expand your knowledge of patterns and cover seven important new topics (escaping, anchoring, character classes, shorthand classes, quantifiers, precedence, and grouping).
-Next, we'll talk about some of the other types of patterns that stringr functions can work with and the various "flags" that allow you to tweak the operation of regular expressions.
-We'll finish with a survey of other places in the tidyverse and base R where you might use regexes.
+本章将从正则表达式的基础知识以及数据分析中最实用的 stringr 函数开始。
+随后将拓展你对模式匹配的认知，涵盖七个重要新主题（转义、锚定、字符类、简写字符类、量词、优先级和分组）。
+接着我们将讨论 stringr 函数可处理的其他模式类型，以及允许调整正则表达式操作的各种“标志”。
+最后将概述 tidyverse 和 base R 中其他可能使用正则表达式的场景。
 
 ### Prerequisites
 
-In this chapter, we'll use regular expression functions from stringr and tidyr, both core members of the tidyverse, as well as data from the babynames package.
+本章我们将使用来自 tidyverse 核心成员 stringr 和 tidyr 的正则表达式函数，以及 babynames 包的数据。
 
 ```{r}
 #| label: setup
@@ -30,48 +30,45 @@ library(tidyverse)
 library(babynames)
 ```
 
-Through this chapter, we'll use a mix of very simple inline examples so you can get the basic idea, the baby names data, and three character vectors from stringr:
+本章将结合使用简单的内联示例（帮助你理解基础概念）、婴儿姓名数据，以及来自 stringr 的三个字符向量：
 
--   `fruit` contains the names of 80 fruits.
--   `words` contains 980 common English words.
--   `sentences` contains 720 short sentences.
+-   `fruit` 包含80种水果的名称。
+-   `words` 包含980个常见英语单词。
+-   `sentences` 包含720个短句。
 
 ## Pattern basics {#sec-reg-basics}
 
-We'll use `str_view()` to learn how regex patterns work.
-We used `str_view()` in the last chapter to better understand a string vs. its printed representation, and now we'll use it with its second argument, a regular expression.
-When this is supplied, `str_view()` will show only the elements of the string vector that match, surrounding each match with `<>`, and, where possible, highlighting the match in blue.
+我们将使用`str_view()`来理解正则表达式模式的工作原理。
+在上一章中，我们使用`str_view()`来更好理解字符串与其打印表示形式之间的区别，现在我们将使用它的第二个参数——一个正则表达式。
+当提供此参数时，`str_view()`将仅显示字符串向量中匹配的元素，用`<>`包围每个匹配项，并尽可能用蓝色高亮显示匹配部分。
 
-The simplest patterns consist of letters and numbers which match those characters exactly:
+最简单的模式由字母和数字组成，它们会精确匹配这些字符：
 
 ```{r}
 str_view(fruit, "berry")
 ```
 
-Letters and numbers match exactly and are called **literal characters**.
-Most punctuation characters, like `.`, `+`, `*`, `[`, `]`, and `?`, have special meanings[^regexps-2] and are called **metacharacters**. For example, `.`
-will match any character[^regexps-3], so `"a."` will match any string that contains an "a" followed by another character
-:
+字母和数字会精确匹配，因此被称为**字面字符(literal characters)**。
+而大多数标点符号（如`.`, `+`, `*`, `[`, `]`, `?`）具有特殊含义，被称为**元字符(metacharacters)**。
+例如，`.`可以匹配任意字符[^regexps-2]，所以`"a."`会匹配任何包含字母“a”且后接另一个字符的字符串：
 
-[^regexps-2]: You'll learn how to escape these special meanings in @sec-regexp-escaping.
-
-[^regexps-3]: Well, any character apart from `\n`.
+[^regexps-2]: 好的，除了`\n`之外的任何字符。
 
 ```{r}
 str_view(c("a", "ab", "ae", "bd", "ea", "eab"), "a.")
 ```
 
-Or we could find all the fruits that contain an "a", followed by three letters, followed by an "e":
+或者我们可以找出所有包含字母“a”、后接三个任意字母、最后接字母“e”的水果名称：
 
 ```{r}
 str_view(fruit, "a...e")
 ```
 
-**Quantifiers** control how many times a pattern can match:
+**量词(Quantifiers)**控制模式匹配的次数：
 
--   `?` makes a pattern optional (i.e. it matches 0 or 1 times)
--   `+` lets a pattern repeat (i.e. it matches at least once)
--   `*` lets a pattern be optional or repeat (i.e. it matches any number of times, including 0).
+-   `?` 使模式成为可选项（即匹配 0 次或 1 次）
+-   `+` 允许模式重复（即至少匹配一次）
+-   `*` 允许模式成为可选项或重复（即匹配任意次数，包括0次）
 
 ```{r}
 # ab? matches an "a", optionally followed by a "b".
@@ -84,42 +81,42 @@ str_view(c("a", "ab", "abb"), "ab+")
 str_view(c("a", "ab", "abb"), "ab*")
 ```
 
-**Character classes** are defined by `[]` and let you match a set of characters, e.g., `[abcd]` matches "a", "b", "c", or "d".
-You can also invert the match by starting with `^`: `[^abcd]` matches anything **except** "a", "b", "c", or "d".
-We can use this idea to find the words containing an "x" surrounded by vowels, or a "y" surrounded by consonants:
+**字符类(Character classes)**由`[]`定义，允许您匹配一组字符，例如`[abcd]`会匹配"a"、"b"、"c"或"d"。
+您还可以使用`^`开头来反向匹配：`[^abcd]`会匹配除"a"、"b"、"c"、"d"以外的任何字符。
+我们可以利用这个思路来查找包含被元音字母包围的"x"，或被辅音字母包围的"y"的单词：
 
 ```{r}
 str_view(words, "[aeiou]x[aeiou]")
 str_view(words, "[^aeiou]y[^aeiou]")
 ```
 
-You can use **alternation**, `|`, to pick between one or more alternative patterns.
-For example, the following patterns look for fruits containing "apple", "melon", or "nut", or a repeated vowel.
+你可以使用**交替符(alternation)**，`|`，在一个或多个备选模式中进行选择。
+例如，以下模式会查找包含"apple"、"melon"或"nut"的水果，或者包含重复元音的水果。
 
 ```{r}
 str_view(fruit, "apple|melon|nut")
 str_view(fruit, "aa|ee|ii|oo|uu")
 ```
 
-Regular expressions are very compact and use a lot of punctuation characters, so they can seem overwhelming and hard to read at first.
-Don't worry; you'll get better with practice, and simple patterns will soon become second nature.
-Let's kick off that process by practicing with some useful stringr functions.
+正则表达式非常紧凑且使用大量标点符号，因此初看可能令人难以应对且难以阅读。
+别担心；通过练习你会逐渐掌握，简单的模式很快就会变得得心应手。
+让我们通过练习一些实用的 stringr 函数来启动这个学习过程。
 
 ## Key functions {#sec-stringr-regex-funs}
 
-Now that you've got the basics of regular expressions under your belt, let's use them with some stringr and tidyr functions.
-In the following section, you'll learn how to detect the presence or absence of a match, how to count the number of matches, how to replace a match with fixed text, and how to extract text using a pattern.
+既然你已经掌握了正则表达式的基础知识，现在让我们将其与一些 stringr 和 tidyr 函数结合使用。
+在接下来的部分中，你将学习如何检测匹配项的存在与否、如何统计匹配次数、如何用固定文本替换匹配项，以及如何使用模式提取文本。
 
 ### Detect matches
 
-`str_detect()` returns a logical vector that is `TRUE` if the pattern matches an element of the character vector and `FALSE` otherwise:
+`str_detect()` 会返回一个逻辑向量：当模式匹配字符向量中的元素时返回 `TRUE`，否则返回 `FALSE`。
 
 ```{r}
 str_detect(c("a", "b", "c"), "[aeiou]")
 ```
 
-Since `str_detect()` returns a logical vector of the same length as the initial vector, it pairs well with `filter()`.
-For example, this code finds all the most popular names containing a lower-case "x":
+由于 `str_detect()` 返回的逻辑向量与初始向量长度相同，它非常适合与 `filter()` 配合使用。
+例如，以下代码可以找出所有包含小写字母 "x" 的热门姓名：
 
 ```{r}
 babynames |> 
@@ -127,11 +124,11 @@ babynames |>
   count(name, wt = n, sort = TRUE)
 ```
 
-We can also use `str_detect()` with `summarize()` by pairing it with `sum()` or `mean()`: `sum(str_detect(x, pattern))` tells you the number of observations that match and `mean(str_detect(x, pattern))` tells you the proportion that match.
-For example, the following snippet computes and visualizes the proportion of baby names[^regexps-4] that contain "x", broken down by year.
-It looks like they've radically increased in popularity lately!
+我们也可以将`str_detect()`与`summarize()`结合使用，配合`sum()`或`mean()`函数：`sum(str_detect(x, pattern))`可统计匹配的观测值数量，而`mean(str_detect(x, pattern))`则能计算匹配的比例。
+例如，以下代码片段计算并按年份细分了包含字母"x"的婴儿姓名[^regexps-3]比例，并通过可视化展示。
+从结果来看，这类名字近年来的受欢迎程度似乎急剧上升！
 
-[^regexps-4]: This gives us the proportion of **names** that contain an "x"; if you wanted the proportion of babies with a name containing an x, you'd need to perform a weighted mean.
+[^regexps-3]: 这意味着我们得到的是包含"x"的**姓名**比例；若想计算拥有带"x"名字的**婴儿**比例，则需要执行加权平均计算。
 
 ```{r}
 #| fig-alt: |
@@ -146,30 +143,30 @@ babynames |>
   geom_line()
 ```
 
-There are two functions that are closely related to `str_detect()`: `str_subset()` and `str_which()`.
-`str_subset()` returns a character vector containing only the strings that match.
-`str_which()` returns an integer vector giving the positions of the strings that match.
+有两个与`str_detect()`密切相关的函数：`str_subset()`和`str_which()`。
+`str_subset()`返回一个仅包含匹配字符串的字符向量。
+`str_which()`返回一个给出匹配字符串位置的整数向量。
 
 ### Count matches
 
-The next step up in complexity from `str_detect()` is `str_count()`: rather than a true or false, it tells you how many matches there are in each string.
+在复杂度上比`str_detect()`更进一步的当属`str_count()`：它不再返回简单的true/false判断，而是告诉你每个字符串中存在多少处匹配。
 
 ```{r}
 x <- c("apple", "banana", "pear")
 str_count(x, "p")
 ```
 
-Note that each match starts at the end of the previous match, i.e. regex matches never overlap.
-For example, in `"abababa"`, how many times will the pattern `"aba"` match?
-Regular expressions say two, not three:
+需要注意的是，每处匹配都从上一处匹配的结尾开始，也就是说正则表达式匹配永远不会重叠。
+例如在`"abababa"`中，模式`"aba"`会匹配多少次？正
+则表达式的答案是2次而非3次：
 
 ```{r}
 str_count("abababa", "aba")
 str_view("abababa", "aba")
 ```
 
-It's natural to use `str_count()` with `mutate()`.
-The following example uses `str_count()` with character classes to count the number of vowels and consonants in each name.
+很自然地，我们会将`str_count()`与`mutate()`结合使用。
+下面这个示例通过`str_count()`配合字符类来统计每个名字中元音和辅音的数量。
 
 ```{r}
 babynames |> 
@@ -180,18 +177,18 @@ babynames |>
   )
 ```
 
-If you look closely, you'll notice that there's something off with our calculations: "Aaban" contains three "a"s, but our summary reports only two vowels.
-That's because regular expressions are case sensitive.
-There are three ways we could fix this:
+如果仔细观察，你会发现我们的计算存在一些问题："Aaban"包含三个"a"，但我们的汇总结果只显示两个元音。
+这是因为正则表达式区分大小写。
+我们可以通过三种方式解决这个问题：
 
--   Add the upper case vowels to the character class: `str_count(name, "[aeiouAEIOU]")`.
--   Tell the regular expression to ignore case: `str_count(name, regex("[aeiou]", ignore_case = TRUE))`. We'll talk about more in @sec-flags.
--   Use `str_to_lower()` to convert the names to lower case: `str_count(str_to_lower(name), "[aeiou]")`.
+-   在字符类中添加大写元音字母：`str_count(name, "[aeiouAEIOU]")`。
+-   告知正则表达式忽略大小写：`str_count(name, regex("[aeiou]", ignore_case = TRUE))`。我们将在\@sec-flags进一步讨论。
+-   使用`str_to_lower()`将姓名转换为小写：`str_count(str_to_lower(name), "[aeiou]")`。
 
-This variety of approaches is pretty typical when working with strings --- there are often multiple ways to reach your goal, either by making your pattern more complicated or by doing some preprocessing on your string.
-If you get stuck trying one approach, it can often be useful to switch gears and tackle the problem from a different perspective.
+这种处理字符串的方法多样性相当典型 --- 通常有多种途径可以实现目标，既可以通过让模式更复杂，也可以对字符串进行预处理。
+如果某种方法遇到困难，转换思路并从不同角度解决问题通常会很有帮助。
 
-In this case, since we're applying two functions to the name, I think it's easier to transform it first:
+就本例而言，由于我们需要对姓名应用两个函数，我认为先进行转换会更简单：
 
 ```{r}
 babynames |> 
@@ -205,33 +202,33 @@ babynames |>
 
 ### Replace values
 
-As well as detecting and counting matches, we can also modify them with `str_replace()` and `str_replace_all()`.
-`str_replace()` replaces the first match, and as the name suggests, `str_replace_all()` replaces all matches.
+除了检测和计数匹配项外，我们还可以使用`str_replace()`和`str_replace_all()`来修改它们。
+`str_replace()`替换第一个匹配项，而顾名思义，`str_replace_all()`会替换所有匹配项。
 
 ```{r}
 x <- c("apple", "pear", "banana")
 str_replace_all(x, "[aeiou]", "-")
 ```
 
-`str_remove()` and `str_remove_all()` are handy shortcuts for `str_replace(x, pattern, "")`:
+`str_remove()`和`str_remove_all()`则是`str_replace(x, pattern, "")`的便捷快捷方式：
 
 ```{r}
 x <- c("apple", "pear", "banana")
 str_remove_all(x, "[aeiou]")
 ```
 
-These functions are naturally paired with `mutate()` when doing data cleaning, and you'll often apply them repeatedly to peel off layers of inconsistent formatting.
+在进行数据清理时，这些函数很自然地与`mutate()`配合使用，通常需要反复应用它们来逐层剥离不一致的格式。
 
 ### Extract variables {#sec-extract-variables}
 
-The last function we'll discuss uses regular expressions to extract data out of one column into one or more new columns: `separate_wider_regex()`.
-It's a peer of the `separate_wider_position()` and `separate_wider_delim()` functions that you learned about in @sec-string-columns.
-These functions live in tidyr because they operate on (columns of) data frames, rather than individual vectors.
+我们将讨论的最后一个函数是使用正则表达式将数据从某列提取到一个或多个新列中：`separate_wider_regex()`。
+它是您在\@sec-string-columns学过的`separate_wider_position()`和`separate_wider_delim()`函数的同类函数。
+这些函数属于 tidyr 包，因为它们作用于数据框的列，而非单个向量。
 
-Let's create a simple dataset to show how it works.
-Here we have some data derived from `babynames` where we have the name, gender, and age of a bunch of people in a rather weird format[^regexps-5]:
+让我们创建一个简单数据集来演示其工作原理。
+这里有一些源自`babynames`的数据，其中包含一组人员的姓名、性别和年龄，但格式相当奇怪[^regexps-4]：
 
-[^regexps-5]: We wish we could reassure you that you'd never see something this weird in real life, but unfortunately over the course of your career you're likely to see much weirder!
+[^regexps-4]: 我们希望能向您保证不会在现实生活中遇到如此奇怪的情况，但遗憾的是在您的职业生涯中，很可能会遇到更加离奇的事情！
 
 ```{r}
 df <- tribble(
@@ -246,8 +243,8 @@ df <- tribble(
 )
 ```
 
-To extract this data using `separate_wider_regex()` we just need to construct a sequence of regular expressions that match each piece.
-If we want the contents of that piece to appear in the output, we give it a name:
+使用`separate_wider_regex()`提取这些数据时，我们只需构建一系列匹配每个片段的正则表达式。
+若希望该片段的内容出现在输出中，我们需要为其命名：
 
 ```{r}
 df |> 
@@ -263,44 +260,44 @@ df |>
   )
 ```
 
-If the match fails, you can use `too_short = "debug"` to figure out what went wrong, just like `separate_wider_delim()` and `separate_wider_position()`.
+如果匹配失败，可以像使用`separate_wider_delim()`和`separate_wider_position()`时那样，通过设置`too_short = "debug"`来排查问题。
 
 ### Exercises
 
-1.  What baby name has the most vowels?
-    What name has the highest proportion of vowels?
-    (Hint: what is the denominator?)
+1.  哪个婴儿名字包含最多元音？
+    哪个名字的元音比例最高？
+    （提示：分母是什么？）
 
-2.  Replace all forward slashes in `"a/b/c/d/e"` with backslashes.
-    What happens if you attempt to undo the transformation by replacing all backslashes with forward slashes?
-    (We'll discuss the problem very soon.)
+2.  将`"a/b/c/d/e"`中的所有正斜杠替换为反斜杠。
+    如果尝试通过将所有反斜杠替换为正斜杠来撤销转换，会发生什么？
+    （我们很快就会讨论这个问题。）
 
-3.  Implement a simple version of `str_to_lower()` using `str_replace_all()`.
+3.  使用`str_to_lower()`实现一个简易版的`str_replace_all()`。
 
-4.  Create a regular expression that will match telephone numbers as commonly written in your country.
+4.  创建一个能匹配贵国常见电话号码格式的正则表达式。
 
 ## Pattern details
 
-Now that you understand the basics of the pattern language and how to use it with some stringr and tidyr functions, it's time to dig into more of the details.
-First, we'll start with **escaping**, which allows you to match metacharacters that would otherwise be treated specially.
-Next, you'll learn about **anchors** which allow you to match the start or end of the string.
-Then, you'll learn more about **character classes** and their shortcuts which allow you to match any character from a set.
-Next, you'll learn the final details of **quantifiers** which control how many times a pattern can match.
-Then, we have to cover the important (but complex) topic of **operator precedence** and parentheses.
-And we'll finish off with some details of **grouping** components of the pattern.
+既然您已掌握模式语言的基础知识及其在 stringr 和 tidyr 函数中的运用，现在该深入了解更多细节了。
+首先从**转义(escaping)**开始，它能让你匹配原本具有特殊含义的元字符。
+接着，将学习**锚点(anchors)**，用于匹配字符串的首尾位置。
+然后，深入了解**字符类(character classes)**及其简写形式，从而匹配集合中的任意字符。
+随后，你会学习**量词(quantifiers)**的完整细节，这些量词控制着模式的匹配次数。
+接着必须讨论**运算符优先级(operator precedence)**与括号这一重要（但复杂）的主题。
+最后以模式**分组(grouping)**组件的具体细节作为结束。
 
-The terms we use here are the technical names for each component.
-They're not always the most evocative of their purpose, but it's very helpful to know the correct terms if you later want to Google for more details.
+这里使用的术语是各组成部分的技术名称。
+这些名称未必都能直观体现其功能，但若后续需要搜索更多细节时，了解正确术语将非常有帮助。
 
 ### Escaping {#sec-regexp-escaping}
 
-In order to match a literal `.`, you need an **escape** which tells the regular expression to match metacharacters[^regexps-6] literally.
-Like strings, regexps use the backslash for escaping.
-So, to match a `.`, you need the regexp `\.`. Unfortunately this creates a problem.
-We use strings to represent regular expressions, and `\` is also used as an escape symbol in strings.
-So to create the regular expression `\.` we need the string `"\\."`, as the following example shows.
+为了匹配字面意义的`.`，你需要使用**转义符(escape)**来告知正则表达式按字面意义匹配元字符[^regexps-5]。
+和字符串一样，正则表达式使用反斜杠进行转义。
+因此，要匹配一个`.`，你需要使用正则表达式`\.`。但这样会带来一个问题。
+我们用字符串来表示正则表达式，而`\`在字符串中也用作转义符号。
+所以要创建正则表达式`\.`，我们需要使用字符串`"\\."`，如下例所示。
 
-[^regexps-6]: The complete set of metacharacters is `.^$\|*+?{}[]()`
+[^regexps-5]: 完整的元字符集是 `.^$\|*+?{}[]()`
 
 ```{r}
 # To create the regular expression \., we need to use \\.
@@ -313,13 +310,13 @@ str_view(dot)
 str_view(c("abc", "a.c", "bef"), "a\\.c")
 ```
 
-In this book, we'll usually write regular expression without quotes, like `\.`.
-If we need to emphasize what you'll actually type, we'll surround it with quotes and add extra escapes, like `"\\."`.
+在本书中，我们通常不会给正则表达式加引号，例如`\.`。
+如果需要强调实际需要输入的内容，则会为其添加引号和额外的转义符号，如`"\\."`。
 
-If `\` is used as an escape character in regular expressions, how do you match a literal `\`?
-Well, you need to escape it, creating the regular expression `\\`.
-To create that regular expression, you need to use a string, which also needs to escape `\`.
-That means to match a literal `\` you need to write `"\\\\"` --- you need four backslashes to match one!
+如果`\`在正则表达式中用作转义字符，那么如何匹配字面意义上的`\`呢？
+你需要对它进行转义，构建出`\\`这样的正则表达式。
+而为了构建这个正则表达式，你需要使用字符串，字符串本身也需要对`\`进行转义。
+这意味着要匹配一个字面意义上的`\`，你必须写成`"\\\\"` --- 需要四个反斜杠才能匹配一个！
 
 ```{r}
 x <- "a\\b"
@@ -327,15 +324,15 @@ str_view(x)
 str_view(x, "\\\\")
 ```
 
-Alternatively, you might find it easier to use the raw strings you learned about in @sec-raw-strings).
-That lets you avoid one layer of escaping:
+或者，您可能会发现使用\@sec-raw-strings介绍的原始字符串更简便。
+这样可以避免一层转义：
 
 ```{r}
 str_view(x, r"{\\}")
 ```
 
-If you're trying to match a literal `.`, `$`, `|`, `*`, `+`, `?`, `{`, `}`, `(`, `)`, there's an alternative to using a backslash escape: you can use a character class: `[.]`, `[$]`, `[|]`, \...
-all match the literal values.
+如果您需要匹配字面字符 `.`, `$`, `|`, `*`, `+`, `?`, `{`, `}`, `(`, `)`，除了使用反斜杠转义外还有另一种选择：可以使用字符类：`[.]`, `[$]`, `[|]`, ...
+所有这些都能匹配对应的字面值。
 
 ```{r}
 str_view(c("abc", "a.c", "a*c", "a c"), "a[.]c")
@@ -344,26 +341,26 @@ str_view(c("abc", "a.c", "a*c", "a c"), ".[*]c")
 
 ### Anchors
 
-By default, regular expressions will match any part of a string.
-If you want to match at the start or end you need to **anchor** the regular expression using `^` to match the start or `$` to match the end:
+默认情况下，正则表达式会匹配字符串的任意部分。
+若需匹配字符串起始或结束位置，需要使用**锚点(anchor)**：`^` 匹配起始位置，`$` 匹配结束位置：
 
 ```{r}
 str_view(fruit, "^a")
 str_view(fruit, "a$")
 ```
 
-It's tempting to think that `$` should match the start of a string, because that's how we write dollar amounts, but that's not what regular expressions want.
+人们容易认为 `$` 应该匹配字符串开头（因为美元金额通常这样书写），但这不符合正则表达式的规则。
 
-To force a regular expression to match only the full string, anchor it with both `^` and `$`:
+若要强制正则表达式仅匹配完整字符串，需同时使用 `^` 和 `$` 进行锚定：
 
 ```{r}
 str_view(fruit, "apple")
 str_view(fruit, "^apple$")
 ```
 
-You can also match the boundary between words (i.e. the start or end of a word) with `\b`.
-This can be particularly useful when using RStudio's find and replace tool.
-For example, if to find all uses of `sum()`, you can search for `\bsum\b` to avoid matching `summarize`, `summary`, `rowsum` and so on:
+你也可以使用 `\b` 来匹配单词边界（即单词的开始或结束）。
+这在配合 RStudio 的查找替换工具时特别有用。
+例如，若要查找所有 `sum()` 的用法，可以通过搜索 `\bsum\b` 来避免匹配到 `summarize`, `summary`, `rowsum` 等函数：
 
 ```{r}
 x <- c("summary(x)", "summarize(df)", "rowsum(x)", "sum(x)")
@@ -371,13 +368,13 @@ str_view(x, "sum")
 str_view(x, "\\bsum\\b")
 ```
 
-When used alone, anchors will produce a zero-width match:
+当单独使用锚点时，会产生零宽度匹配：
 
 ```{r}
 str_view("abc", c("$", "^", "\\b"))
 ```
 
-This helps you understand what happens when you replace a standalone anchor:
+这有助于理解替换独立锚点时会发生的情况：
 
 ```{r}
 str_replace_all("abc", c("$", "^", "\\b"), "--")
@@ -385,14 +382,14 @@ str_replace_all("abc", c("$", "^", "\\b"), "--")
 
 ### Character classes
 
-A **character class**, or character **set**, allows you to match any character in a set.
-As we discussed above, you can construct your own sets with `[]`, where `[abc]` matches "a", "b", or "c" and `[^abc]` matches any character except "a", "b", or "c".
-Apart from `^` there are two other characters that have special meaning inside of `[]:`
+**字符类(character class)**，或称**字符集(character set)**，允许你匹配集合中的任意字符。
+正如前面讨论的，你可以用`[]`来自定义集合：`[abc]`会匹配"a"、"b"或"c"，而`[^abc]`则匹配除"a"、"b"、"c"外的任意字符。
+除了`^`之外，还有两个字符在`[]`内具有特殊含义：
 
--   `-` defines a range, e.g., `[a-z]` matches any lower case letter and `[0-9]` matches any number.
--   `\` escapes special characters, so `[\^\-\]]` matches `^`, `-`, or `]`.
+-   `-` 用于定义范围，例如`[a-z]`匹配所有小写字母，`[0-9]`匹配任意数字。
+-   `\` 用于转义特殊字符，因此`[\^\-\]]`会匹配`^`, `-` 或 `]`。
 
-Here are few examples:
+以下是一些示例：
 
 ```{r}
 x <- "abcd ABCD 12345 -!@#%."
@@ -406,20 +403,20 @@ str_view("a-b-c", "[a-c]")
 str_view("a-b-c", "[a\\-c]")
 ```
 
-Some character classes are used so commonly that they get their own shortcut.
-You've already seen `.`, which matches any character apart from a newline.
-There are three other particularly useful pairs[^regexps-7]:
+有些字符类因使用频率极高而拥有专属简写模式。
+您已见过`.`，匹配除换行符外任意字符。
+另外还有三组特别实用的对应简写[^regexps-6]：
 
-[^regexps-7]: Remember, to create a regular expression containing `\d` or `\s`, you'll need to escape the `\` for the string, so you'll type `"\\d"` or `"\\s"`.
+[^regexps-6]: 请记住，要创建包含`\d`或`\s`的正则表达式，您需要转义字符串的`\`，因此您需要输入`"\\d"`或`"\\s"`。
 
--   `\d` matches any digit;\
-    `\D` matches anything that isn't a digit.
--   `\s` matches any whitespace (e.g., space, tab, newline);\
-    `\S` matches anything that isn't whitespace.
--   `\w` matches any "word" character, i.e. letters and numbers;\
-    `\W` matches any "non-word" character.
+-   `\d` 匹配任意数字;\
+    `\D` 匹配任意非数字字符。
+-   `\s` 匹配任意空白字符（如空格、制表符、换行符）;\
+    `\S` 匹配任意非空白字符。
+-   `\w` 匹配任意“单词”字符（即字母和数字）;\
+    `\W` 匹配任意“非单词”字符。
 
-The following code demonstrates the six shortcuts with a selection of letters, numbers, and punctuation characters.
+以下代码通过选取字母、数字和标点符号来演示这六种简写模式。
 
 ```{r}
 x <- "abcd ABCD 12345 -!@#%."
@@ -433,48 +430,49 @@ str_view(x, "\\W+")
 
 ### Quantifiers {#sec-quantifiers}
 
-**Quantifiers** control how many times a pattern matches.
-In @sec-reg-basics you learned about `?` (0 or 1 matches), `+` (1 or more matches), and `*` (0 or more matches).
-For example, `colou?r` will match American or British spelling, `\d+` will match one or more digits, and `\s?` will optionally match a single item of whitespace.
-You can also specify the number of matches precisely with `{}`:
+**量词(Quantifiers)**用于控制模式的匹配次数。
+在\@sec-reg-basics中您已学习了`?`（匹配0或1次）、`+`（匹配1次或多次）和`*`（匹配0次或多次）。
+例如，`colou?r`可匹配美式或英式拼写，`\d+`将匹配一个或多个数字，`\s?`则可选择性地匹配单个空白字符。
+您还可以使用`{}`精确指定匹配次数：
 
--   `{n}` matches exactly n times.
--   `{n,}` matches at least n times.
--   `{n,m}` matches between n and m times.
+-   `{n}` 精确匹配n次。
+-   `{n,}` 至少匹配n次。
+-   `{n,m}` 匹配n到m次。
 
 ### Operator precedence and parentheses
 
-What does `ab+` match?
-Does it match "a" followed by one or more "b"s, or does it match "ab" repeated any number of times?
-What does `^a|b$` match?
-Does it match the complete string a or the complete string b, or does it match a string starting with a or a string ending with b?
+`ab+`会匹配什么？
+是匹配一个"a"后接一个或多个"b"，还是匹配任意次重复的"ab"？
+而`^a|b$`又会匹配什么？
+是匹配完整的字符串"a"或完整的字符串"b"，还是匹配以"a"开头的字符串或以"b"结尾的字符串？
 
-The answer to these questions is determined by operator precedence, similar to the PEMDAS or BEDMAS rules you might have learned in school.
-You know that `a + b * c` is equivalent to `a + (b * c)` not `(a + b) * c` because `*` has higher precedence and `+` has lower precedence: you compute `*` before `+`.
+这些问题的答案取决于运算符优先级，类似于你在学校可能学过的PEMDAS或BEDMAS规则。
+你知道`a + b * c`等价于`a + (b * c)`而非`(a + b) * c`，因为`*`的优先级高于`+`：需要先计算`*`再计算`+`。
 
-Similarly, regular expressions have their own precedence rules: quantifiers have high precedence and alternation has low precedence which means that `ab+` is equivalent to `a(b+)`, and `^a|b$` is equivalent to `(^a)|(b$)`.
-Just like with algebra, you can use parentheses to override the usual order.
-But unlike algebra you're unlikely to remember the precedence rules for regexes, so feel free to use parentheses liberally.
+同样地，正则表达式也有自己的优先级规则：量词具有高优先级，而交替符具有低优先级。
+这意味着`ab+`等价于`a(b+)`，而`^a|b$`等价于`(^a)|(b$)`。
+就像代数运算一样，你可以使用括号来改变常规顺序。
+但与代数不同的是，你不太可能记住正则表达式的优先级规则，因此请尽管自由地使用括号。
 
 ### Grouping and capturing
 
-As well as overriding operator precedence, parentheses have another important effect: they create **capturing groups** that allow you to use sub-components of the match.
+除了覆盖运算符优先级外，括号还有另一个重要作用：它们创建**捕获组(capturing groups)**，使你能够使用匹配中的子组件。
 
-The first way to use a capturing group is to refer back to it within a match with **back reference**: `\1` refers to the match contained in the first parenthesis, `\2` in the second parenthesis, and so on.
-For example, the following pattern finds all fruits that have a repeated pair of letters:
+使用捕获组的第一种方法是通过**反向引用(back reference)**在匹配中回溯：`\1` 指向第一个括号内的匹配内容，`\2` 指向第二个括号，依此类推。
+例如，以下模式可以找到所有包含重复字母对的水果：
 
 ```{r}
 str_view(fruit, "(..)\\1")
 ```
 
-And this one finds all words that start and end with the same pair of letters:
+这个模式可以找出所有以相同字母对开头和结尾的单词：
 
 ```{r}
 str_view(words, "^(..).*\\1$")
 ```
 
-You can also use back references in `str_replace()`.
-For example, this code switches the order of the second and third words in `sentences`:
+你同样可以在`str_replace()`中使用反向引用。
+例如，以下代码可以调换句子中第二个和第三个单词的顺序：
 
 ```{r}
 sentences |> 
@@ -482,10 +480,10 @@ sentences |>
   str_view()
 ```
 
-If you want to extract the matches for each group you can use `str_match()`.
-But `str_match()` returns a matrix, so it's not particularly easy to work with[^regexps-8]:
+如果想要提取每个分组的匹配内容，可以使用`str_match()`。
+但`str_match()`会返回一个矩阵，因此处理起来不太方便[^regexps-7]：
 
-[^regexps-8]: Mostly because we never discuss matrices in this book!
+[^regexps-7]: 主要是因为我们从未在本书中讨论矩阵！
 
 ```{r}
 sentences |> 
@@ -493,7 +491,7 @@ sentences |>
   head()
 ```
 
-You could convert to a tibble and name the columns:
+你可以将其转换为tibble并为列命名：
 
 ```{r}
 sentences |> 
@@ -502,11 +500,11 @@ sentences |>
   set_names("match", "word1", "word2")
 ```
 
-But then you've basically recreated your own version of `separate_wider_regex()`.
-Indeed, behind the scenes, `separate_wider_regex()` converts your vector of patterns to a single regex that uses grouping to capture the named components.
+但这样你基本上就重建了自己版本的`separate_wider_regex()`。
+实际上，在底层实现中，`separate_wider_regex()`会将你的模式向量转换为使用分组来捕获命名组件的单个正则表达式。
 
-Occasionally, you'll want to use parentheses without creating matching groups.
-You can create a non-capturing group with `(?:)`.
+偶尔你会希望使用括号但不创建匹配组。
+这时可以使用`(?:)`创建非捕获组。
 
 ```{r}
 x <- c("a gray cat", "a grey dog")
@@ -516,28 +514,28 @@ str_match(x, "gr(?:e|a)y")
 
 ### Exercises
 
-1.  How would you match the literal string `"'\`? How about `"$^$"`?
+1.  你如何匹配字面字符串 `"'\`？又该如何匹配 `"$^$"`？
 
-2.  Explain why each of these patterns don't match a `\`: `"\"`, `"\\"`, `"\\\"`.
+2.  请解释为何这些模式都无法匹配`\`：`"\"`, `"\\"`, `"\\\"`。
 
-3.  Given the corpus of common words in `stringr::words`, create regular expressions that find all words that:
+3.  基于 `stringr::words` 中的常见词汇库，创建正则表达式来找出所有符合以下条件的单词：
 
-    a.  Start with "y".
-    b.  Don't start with "y".
-    c.  End with "x".
-    d.  Are exactly three letters long. (Don't cheat by using `str_length()`!)
-    e.  Have seven letters or more.
-    f.  Contain a vowel-consonant pair.
-    g.  Contain at least two vowel-consonant pairs in a row.
-    h.  Only consist of repeated vowel-consonant pairs.
+    a.  以“y”开头
+    b.  不以“y”开头
+    c.  以“x”结尾
+    d.  恰好由三个字母组成（不要通过 `str_length()` 作弊！）
+    e.  包含七个或更多字母
+    f.  包含元音-辅音组合
+    g.  连续包含至少两个元音-辅音组合
+    h.  仅由重复的元音-辅音组合构成
 
-4.  Create 11 regular expressions that match the British or American spellings for each of the following words: airplane/aeroplane, aluminum/aluminium, analog/analogue, ass/arse, center/centre, defense/defence, donut/doughnut, gray/grey, modeling/modelling, skeptic/sceptic, summarize/summarise.
-    Try and make the shortest possible regex!
+4.  请创建11个正则表达式，分别匹配下列单词的英式或美式拼写：airplane/aeroplane、aluminum/aluminium、analog/analogue、ass/arse、center/centre、defense/defence、donut/doughnut、gray/grey、modeling/modelling、skeptic/sceptic、summarize/summarise。
+    请尝试写出最简短的正则表达式！
 
-5.  Switch the first and last letters in `words`.
-    Which of those strings are still `words`?
+5.  将单词的首尾字母互换。
+    哪些互换后的字符串仍然是单词？
 
-6.  Describe in words what these regular expressions match: (read carefully to see if each entry is a regular expression or a string that defines a regular expression.)
+6.  用文字描述下列正则表达式分别匹配什么内容（请仔细辨别每个条目是正则表达式还是用于定义正则表达式的字符串）：
 
     a.  `^.*$`
     b.  `"\\{.+\\}"`
@@ -547,19 +545,19 @@ str_match(x, "gr(?:e|a)y")
     f.  `(.)\1\1`
     g.  `"(..)\\1"`
 
-7.  Solve the beginner regexp crosswords at <https://regexcrossword.com/challenges/beginner>.
+7.  解答初学者正则表达式填字游戏：<https://regexcrossword.com/challenges/beginner>.
 
 ## Pattern control
 
-It's possible to exercise extra control over the details of the match by using a pattern object instead of just a string.
-This allows you to control the so called regex flags and match various types of fixed strings, as described below.
+通过使用模式对象而非单纯字符串，可以对匹配细节实施额外控制。
+这允许您控制所谓的正则表达式标志，并匹配各种类型的固定字符串，具体说明如下。
 
 ### Regex flags {#sec-flags}
 
-There are a number of settings that can be used to control the details of the regexp.
-These settings are often called **flags** in other programming languages.
-In stringr, you can use these by wrapping the pattern in a call to `regex()`.
-The most useful flag is probably `ignore_case = TRUE` because it allows characters to match either their uppercase or lowercase forms:
+有多种设置可用于控制正则表达式的匹配细节。
+这些设置在其它编程语言中通常被称为**标志(flags)**。
+在stringr中，您可以通过将模式包裹在`regex()`函数中来使用这些设置。
+其中最实用的标志大概是`ignore_case = TRUE`，因为它允许字符匹配其大写或小写形式：
 
 ```{r}
 bananas <- c("banana", "Banana", "BANANA")
@@ -567,9 +565,9 @@ str_view(bananas, "banana")
 str_view(bananas, regex("banana", ignore_case = TRUE))
 ```
 
-If you're doing a lot of work with multiline strings (i.e. strings that contain `\n`), `dotall`and `multiline` may also be useful:
+如果您需要处理大量多行字符串（即包含`\n`的字符串），``` dotall``multiline ```参数也会很有用：
 
--   `dotall = TRUE` lets `.` match everything, including `\n`:
+-   `dotall = TRUE`允许`.`匹配所有字符，包括`\n`：
 
     ```{r}
     x <- "Line 1\nLine 2\nLine 3"
@@ -577,7 +575,7 @@ If you're doing a lot of work with multiline strings (i.e. strings that contain 
     str_view(x, regex(".Line", dotall = TRUE))
     ```
 
--   `multiline = TRUE` makes `^` and `$` match the start and end of each line rather than the start and end of the complete string:
+-   `multiline = TRUE` 使得 `^` 和 `$` 分别匹配每行的开头和结尾，而非整个字符串的开头和结尾：
 
     ```{r}
     x <- "Line 1\nLine 2\nLine 3"
@@ -585,11 +583,11 @@ If you're doing a lot of work with multiline strings (i.e. strings that contain 
     str_view(x, regex("^Line", multiline = TRUE))
     ```
 
-Finally, if you're writing a complicated regular expression and you're worried you might not understand it in the future, you might try `comments = TRUE`.
-It tweaks the pattern language to ignore spaces and new lines, as well as everything after `#`.
-This allows you to use comments and whitespace to make complex regular expressions more understandable[^regexps-9], as in the following example:
+最后，如果您正在编写复杂的正则表达式，并且担心将来可能无法理解它，可以尝试使用`comments = TRUE`。
+该选项会调整模式语言的解析规则：忽略空格和换行符以及`#`后面的所有内容。
+这样您就能通过注释和空白字符来提升复杂正则表达式的可读性[^regexps-8]，如下例所示：
 
-[^regexps-9]: `comments = TRUE` is particularly effective in combination with a raw string, as we use here.
+[^regexps-8]: `comments = TRUE` 与原始字符串结合使用时特别有效，正如我们在这里使用的。
 
 ```{r}
 phone <- regex(
@@ -608,25 +606,25 @@ phone <- regex(
 str_extract(c("514-791-8141", "(123) 456 7890", "123456"), phone)
 ```
 
-If you're using comments and want to match a space, newline, or `#`, you'll need to escape it with `\`.
+如果您使用注释并想要匹配空格、换行符或`#`，则需要使用`\`对其进行转义。
 
 ### Fixed matches
 
-You can opt-out of the regular expression rules by using `fixed()`:
+您可以使用 `fixed()` 来避开正则表达式规则：
 
 ```{r}
 str_view(c("", "a", "."), fixed("."))
 ```
 
-`fixed()` also gives you the ability to ignore case:
+`fixed()` 还具备忽略大小写的能力：
 
 ```{r}
 str_view("x X", "X")
 str_view("x X", fixed("X", ignore_case = TRUE))
 ```
 
-If you're working with non-English text, you will probably want `coll()` instead of `fixed()`, as it implements the full rules for capitalization as used by the `locale` you specify.
-See @sec-other-languages for more details on locales.
+如果您处理的是非英语文本，可能会更倾向于使用 `coll()` 而非 `fixed()`，因为它能根据您指定的 `locale` 实现完整的大小写规则。
+有locales的更多详细信息，请参阅 @sec-other-languages。
 
 ```{r}
 str_view("i İ ı I", fixed("İ", ignore_case = TRUE))
@@ -635,44 +633,44 @@ str_view("i İ ı I", coll("İ", ignore_case = TRUE, locale = "tr"))
 
 ## Practice
 
-To put these ideas into practice we'll solve a few semi-authentic problems next.
-We'll discuss three general techniques:
+接下来我们将通过解决几个半真实场景的问题来实践这些概念。
+我们将讨论三种通用技巧：
 
-1.  checking your work by creating simple positive and negative controls
-2.  combining regular expressions with Boolean algebra
-3.  creating complex patterns using string manipulation
+1.  通过创建简单的正向与反向验证来检查工作
+2.  将正则表达式与布尔代数结合使用
+3.  利用字符串操作构建复杂模式
 
 ### Check your work
 
-First, let's find all sentences that start with "The".
-Using the `^` anchor alone is not enough:
+首先，让我们找出所有以"The"开头的句子。
+仅使用 `^` 锚点是不够的：
 
 ```{r}
 str_view(sentences, "^The")
 ```
 
-Because that pattern also matches sentences starting with words like `They` or `These`.
-We need to make sure that the "e" is the last letter in the word, which we can do by adding a word boundary:
+因为该模式也会匹配以 `They` 或 `These` 等单词开头的句子。
+我们需要确保"e"是该单词的最后一个字母，可以通过添加单词边界来实现：
 
 ```{r}
 str_view(sentences, "^The\\b")
 ```
 
-What about finding all sentences that begin with a pronoun?
+那么如何查找所有以代词开头的句子呢？
 
 ```{r}
 str_view(sentences, "^She|He|It|They\\b")
 ```
 
-A quick inspection of the results shows that we're getting some spurious matches.
-That's because we've forgotten to use parentheses:
+快速检查结果发现存在一些错误匹配。
+这是因为我们忘了使用括号：
 
 ```{r}
 str_view(sentences, "^(She|He|It|They)\\b")
 ```
 
-You might wonder how you might spot such a mistake if it didn't occur in the first few matches.
-A good technique is to create a few positive and negative matches and use them to test that your pattern works as expected:
+你可能会想，如果错误匹配没有出现在前几个结果中，该如何发现这类错误。
+有个好方法是创建一些正向和反向测试用例，用它们来验证模式是否符合预期：
 
 ```{r}
 pos <- c("He is a boy", "She had a good time")
@@ -683,42 +681,42 @@ str_detect(pos, pattern)
 str_detect(neg, pattern)
 ```
 
-It's typically much easier to come up with good positive examples than negative examples, because it takes a while before you're good enough with regular expressions to predict where your weaknesses are.
-Nevertheless, they're still useful: as you work on the problem you can slowly accumulate a collection of your mistakes, ensuring that you never make the same mistake twice.
+通常想出合适的正向用例比反向用例要容易得多，因为需要经过大量练习才能熟练运用正则表达式来预判自己的薄弱环节。
+尽管如此，反向用例仍然很有用：在解决问题过程中，你可以逐步积累自己出错的案例，确保不会重复犯同样的错误。
 
 ### Boolean operations {#sec-boolean-operations}
 
-Imagine we want to find words that only contain consonants.
-One technique is to create a character class that contains all letters except for the vowels (`[^aeiou]`), then allow that to match any number of letters (`[^aeiou]+`), then force it to match the whole string by anchoring to the beginning and the end (`^[^aeiou]+$`):
+假设我们要查找仅包含辅音的单词。
+一种方法是创建一个排除所有元音的字符类（`[^aeiou]`），允许其匹配任意数量的字母（`[^aeiou]+`），然后通过首尾锚定强制匹配整个字符串（`^[^aeiou]+$`）：
 
 ```{r}
 str_view(words, "^[^aeiou]+$")
 ```
 
-But you can make this problem a bit easier by flipping the problem around.
-Instead of looking for words that contain only consonants, we could look for words that don't contain any vowels:
+但通过转换问题视角可以让解决过程更简单。
+我们可以寻找不包含任何元音的单词，而非直接寻找仅包含辅音的单词：
 
 ```{r}
 str_view(words[!str_detect(words, "[aeiou]")])
 ```
 
-This is a useful technique whenever you're dealing with logical combinations, particularly those involving "and" or "not".
-For example, imagine if you want to find all words that contain "a" and "b".
-There's no "and" operator built in to regular expressions so we have to tackle it by looking for all words that contain an "a" followed by a "b", or a "b" followed by an "a":
+当处理逻辑组合（特别是涉及"与"或"非"的情况）时，这是种实用技巧。
+例如，要查找所有同时包含"a"和"b"的单词。
+由于正则表达式没有内置"与"运算符，我们只能通过寻找包含"a"后接"b"，或"b"后接"a"的单词来实现：
 
 ```{r}
 str_view(words, "a.*b|b.*a")
 ```
 
-It's simpler to combine the results of two calls to `str_detect()`:
+更简单的方法是组合两次`str_detect()`的调用结果：
 
 ```{r}
 words[str_detect(words, "a") & str_detect(words, "b")]
 ```
 
-What if we wanted to see if there was a word that contains all vowels?
-If we did it with patterns we'd need to generate 5!
-(120) different patterns:
+如果想检查是否存在包含所有元音字母的单词呢？
+若使用模式匹配，需要生成5!
+（120）种不同组合：
 
 ```{r}
 #| results: false
@@ -727,7 +725,7 @@ words[str_detect(words, "a.*e.*i.*o.*u")]
 words[str_detect(words, "u.*o.*i.*e.*a")]
 ```
 
-It's much simpler to combine five calls to `str_detect()`:
+更简单的方式是组合五次`str_detect()`调用：
 
 ```{r}
 words[
@@ -739,39 +737,39 @@ words[
 ]
 ```
 
-In general, if you get stuck trying to create a single regexp that solves your problem, take a step back and think if you could break the problem down into smaller pieces, solving each challenge before moving onto the next one.
+总之，如果构建单一正则表达式时遇到困难，不妨退一步思考：是否可以将问题拆解为若干子问题，在进入下一步之前逐个攻克这些小型挑战。
 
 ### Creating a pattern with code
 
-What if we wanted to find all `sentences` that mention a color?
-The basic idea is simple: we just combine alternation with word boundaries.
+如果我们想找出所有提及颜色的句子该怎么办？
+基本思路很简单：只需将交替符与单词边界结合使用。
 
 ```{r}
 str_view(sentences, "\\b(red|green|blue)\\b")
 ```
 
-But as the number of colors grows, it would quickly get tedious to construct this pattern by hand.
-Wouldn't it be nice if we could store the colors in a vector?
+但随着颜色数量的增加，手动构建这个模式很快就会变得繁琐。
+如果能把颜色存储在向量中岂不是更好？
 
 ```{r}
 rgb <- c("red", "green", "blue")
 ```
 
-Well, we can!
-We'd just need to create the pattern from the vector using `str_c()` and `str_flatten()`:
+事实上，我们可以做到！
+只需要用 `str_c()` 和 `str_flatten()` 根据向量创建模式即可：
 
 ```{r}
 str_c("\\b(", str_flatten(rgb, "|"), ")\\b")
 ```
 
-We could make this pattern more comprehensive if we had a good list of colors.
-One place we could start from is the list of built-in colors that R can use for plots:
+如果拥有更全面的颜色列表，我们就能让这个模式更完善。
+可以从 R 语言绘图功能内置的颜色列表入手：
 
 ```{r}
 str_view(colors())
 ```
 
-But lets first eliminate the numbered variants:
+但首先需要剔除带数字编号的变体：
 
 ```{r}
 cols <- colors()
@@ -779,89 +777,89 @@ cols <- cols[!str_detect(cols, "\\d")]
 str_view(cols)
 ```
 
-Then we can turn this into one giant pattern.
-We won't show the pattern here because it's huge, but you can see it working:
+接着将其转换成一个巨型模式。
+此处不展示该模式（因其过于庞大），但可以看到其运行效果：
 
 ```{r}
 pattern <- str_c("\\b(", str_flatten(cols, "|"), ")\\b")
 str_view(sentences, pattern)
 ```
 
-In this example, `cols` only contains numbers and letters so you don't need to worry about metacharacters.
-But in general, whenever you create patterns from existing strings it's wise to run them through `str_escape()` to ensure they match literally.
+这个例子中，`cols` 仅包含数字和字母，因此无需担心元字符的问题。
+但一般来说，只要是根据现有字符串创建模式，最好先通过 `str_escape()` 处理以确保按字面意义匹配。
 
 ### Exercises
 
-1.  For each of the following challenges, try solving it by using both a single regular expression, and a combination of multiple `str_detect()` calls.
+1.  针对以下每个挑战，请尝试使用单一正则表达式和多重`str_detect()`调用组合这两种方式来解决。
 
-    a.  Find all `words` that start or end with `x`.
-    b.  Find all `words` that start with a vowel and end with a consonant.
-    c.  Are there any `words` that contain at least one of each different vowel?
+    a.  找出所有以`x`开头或结尾的单词。
+    b.  找出所有以元音开头、以辅音结尾的单词。
+    c.  是否存在至少包含一个每种不同元音的单词？
 
-2.  Construct patterns to find evidence for and against the rule "i before e except after c"?
+2.  构建模式来验证“i在e前，除非在c后”这条规则？
 
-3.  `colors()` contains a number of modifiers like "lightgray" and "darkblue".
-    How could you automatically identify these modifiers?
-    (Think about how you might detect and then removed the colors that are modified).
+3.  `colors()` 包含许多修饰词，如“lightgray”和“darkblue”。
+    如何自动识别这些修饰词？
+    （思考如何检测并移除被修饰的颜色名称）。
 
-4.  Create a regular expression that finds any base R dataset.
-    You can get a list of these datasets via a special use of the `data()` function: `data(package = "datasets")$results[, "Item"]`.
-    Note that a number of old datasets are individual vectors; these contain the name of the grouping "data frame" in parentheses, so you'll need to strip those off.
+4.  创建一个能匹配任何 base R 数据集的正则表达式。
+    您可以通过`data()`函数的特殊用法获取这些数据集列表：`data(package = "datasets")$results[, "Item"]`。
+    注意一些旧数据集是独立向量；它们包含带括号的分组“数据框”名称，因此需要去除括号内容。
 
 ## Regular expressions in other places
 
-Just like in the stringr and tidyr functions, there are many other places in R where you can use regular expressions.
-The following sections describe some other useful functions in the wider tidyverse and base R.
+与 stringr 和 tidyr 函数类似，在 R 语言中还有许多其他场景可以使用正则表达式。
+以下章节将介绍在更广泛的 tidyverse 生态系统和 base R 中其他一些实用函数。
 
 ### tidyverse
 
-There are three other particularly useful places where you might want to use a regular expressions
+还有三个特别实用的场景可能会用到正则表达式：
 
--   `matches(pattern)` will select all variables whose name matches the supplied pattern.
-    It's a "tidyselect" function that you can use anywhere in any tidyverse function that selects variables (e.g., `select()`, `rename_with()` and `across()`).
+-   `matches(pattern)` 可选取所有变量名符合指定模式的变量。
+    这是一个"tidyselect"函数，可在任何 tidyverse 函数中用于变量选择（例如 `select()`、`rename_with()` 和 `across()`）。
 
--   `pivot_longer()'s` `names_pattern` argument takes a vector of regular expressions, just like `separate_wider_regex()`.
-    It's useful when extracting data out of variable names with a complex structure
+-   `pivot_longer()`的`names_pattern`参数接收正则表达式向量，其用法类似于`separate_wider_regex()`。
+    当需要从具有复杂结构的变量名中提取数据时特别有用。
 
--   The `delim` argument in `separate_longer_delim()` and `separate_wider_delim()` usually matches a fixed string, but you can use `regex()` to make it match a pattern.
-    This is useful, for example, if you want to match a comma that is optionally followed by a space, i.e. `regex(", ?")`.
+-   `separate_longer_delim()`和`separate_wider_delim()`中的`delim`参数通常匹配固定字符串，但使用`regex()`可使其匹配模式。
+    例如，若需要匹配可能跟随空格的逗号（即`regex(", ?")`），这个功能就非常实用。
 
 ### Base R
 
-`apropos(pattern)` searches all objects available from the global environment that match the given pattern.
-This is useful if you can't quite remember the name of a function:
+`apropos(pattern)` 会搜索全局环境中所有符合指定模式的对象。
+当您不太确定某个函数的具体名称时，这个功能非常实用：
 
 ```{r}
 apropos("replace")
 ```
 
-`list.files(path, pattern)` lists all files in `path` that match a regular expression `pattern`.
-For example, you can find all the R Markdown files in the current directory with:
+`list.files(path, pattern)` 能列出指定路径中所有匹配正则表达式模式的文件。
+例如，您可以通过以下方式找到当前目录下所有的 R Markdown 文件：
 
 ```{r}
 head(list.files(pattern = "\\.Rmd$"))
 ```
 
-It's worth noting that the pattern language used by base R is very slightly different to that used by stringr.
-That's because stringr is built on top of the [stringi package](https://stringi.gagolewski.com), which is in turn built on top of the [ICU engine](https://unicode-org.github.io/icu/userguide/strings/regexp.html), whereas base R functions use either the [TRE engine](https://github.com/laurikari/tre) or the [PCRE engine](https://www.pcre.org), depending on whether or not you've set `perl = TRUE`.
-Fortunately, the basics of regular expressions are so well established that you'll encounter few variations when working with the patterns you'll learn in this book.
-You only need to be aware of the difference when you start to rely on advanced features like complex Unicode character ranges or special features that use the `(?…)` syntax.
+需要注意的是，base R 使用的模式语言与 stringr 稍有差异。
+这是因为 stringr 构建于 [stringi package](https://stringi.gagolewski.com) 之上，而 stringi 又基于 [ICU engine](https://unicode-org.github.io/icu/userguide/strings/regexp.html) 引擎 开发；base R 函数则根据是否设置`perl = TRUE` 分别采用 [TRE engine](https://github.com/laurikari/tre) 或 [PCRE engine](https://www.pcre.org)。
+值得庆幸的是，正则表达式的基础知识已经非常标准化，使用本书所教授的模式时几乎不会遇到差异。
+只有当您开始依赖高级功能，例如复杂的 Unicode 字符范围或使用 `(?…)` 语法的特殊特性时，才需要注意这些区别。
 
 ## Summary
 
-With every punctuation character potentially overloaded with meaning, regular expressions are one of the most compact languages out there.
-They're definitely confusing at first but as you train your eyes to read them and your brain to understand them, you unlock a powerful skill that you can use in R and in many other places.
+由于每个标点符号都可能承载多重含义，正则表达式堪称最精炼的语言之一。
+初学时确实令人困惑，但当你训练双眼读懂它们、让大脑理解它们之后，就能解锁这项在 R 及其他众多场景中都能运用的强大技能。
 
-In this chapter, you've started your journey to become a regular expression master by learning the most useful stringr functions and the most important components of the regular expression language.
-And there are plenty of resources to learn more.
+通过本章学习，你已掌握了最实用的 stringr 函数和正则表达式语言的核心组件，开启了成为正则表达式大师的征程。
+此外还有丰富的拓展学习资源可供参考：
 
-A good place to start is `vignette("regular-expressions", package = "stringr")`: it documents the full set of syntax supported by stringr.
-Another useful reference is [https://www.regular-expressions.info/](https://www.regular-expressions.info/tutorial.html).
-It's not R specific, but you can use it to learn about the most advanced features of regexes and how they work under the hood.
+推荐从`vignette("regular-expressions", package = "stringr")`开始，该文档完整记录了 stringr 支持的所有语法规范。
+另一个实用参考是[https://www.regular-expressions.info/](https://www.regular-expressions.info/tutorial.html)。
+虽然不针对 R 语言，但能帮助你了解正则表达式的高阶特性及其底层原理。
 
-It's also good to know that stringr is implemented on top of the stringi package by Marek Gagolewski.
-If you're struggling to find a function that does what you need in stringr, don't be afraid to look in stringi.
-You'll find stringi very easy to pick up because it follows many of the the same conventions as stringr.
+需要了解的是，stringr 构建于 Marek Gagolewski 开发的 stringi 包之上。
+如果在 stringr 中找不到所需功能，不妨查阅 stringi 包。
+你会发现其使用方式与 stringr 一脉相承，很容易上手。
 
-In the next chapter, we'll talk about a data structure closely related to strings: factors.
-Factors are used to represent categorical data in R, i.e. data with a fixed and known set of possible values identified by a vector of strings.
+下一章我们将探讨与字符串密切相关的数据结构：因子(factors)。
+因子用于表示 R 中的分类数据，即那些具有固定且已知的可能取值（由字符串向量标识）的数据类型。
