@@ -28,10 +28,10 @@ Try to translate R for Data Science (the second edition) into Simplified Chinese
 | 13 Numbers                       | ✔        | 2025.8.28  | [TigerZ](https://github.com/ZhengTiger) |
 | 14 Strings                       | ✔        | 2025.9.1   | [TigerZ](https://github.com/ZhengTiger) |
 | 15 Regular expressions           | ✔        | 2025.10.23 | [TigerZ](https://github.com/ZhengTiger) |
-| 16 Factors                       |          |            |                                         |
-| 17 Dates and times               |          |            |                                         |
-| 18 Missing values                |          |            |                                         |
-| 19 Joins                         |          |            |                                         |
+| 16 Factors                       | ✔        | 2025.12.22 | [TigerZ](https://github.com/ZhengTiger) |
+| 17 Dates and times               | ✔        | 2025.12.22 | [TigerZ](https://github.com/ZhengTiger) |
+| 18 Missing values                | ✔        | 2025.12.22 | [TigerZ](https://github.com/ZhengTiger) |
+| 19 Joins                         | ✔        | 2025.12.23 | [TigerZ](https://github.com/ZhengTiger) |
 | 20 Spreadsheets                  |          |            |                                         |
 | 21 Databases                     |          |            |                                         |
 | 22 Arrow                         |          |            |                                         |

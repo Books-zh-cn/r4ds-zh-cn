@@ -7,19 +7,20 @@ source("_common.R")
 
 ## Introduction
 
-Factors are used for categorical variables, variables that have a fixed and known set of possible values.
-They are also useful when you want to display character vectors in a non-alphabetical order.
+因子用于处理分类变量（categorical variables），即那些具有固定且已知可能值集合的变量。
+当你希望以非字母顺序显示字符向量时，它们同样非常有用。
 
-We'll start by motivating why factors are needed for data analysis[^factors-1] and how you can create them with `factor()`. We'll then introduce you to the `gss_cat` dataset which contains a bunch of categorical variables to experiment with.
-You'll then use that dataset to practice modifying the order and values of factors, before we finish up with a discussion of ordered factors.
+我们将首先探讨数据分析为何需要因子[^factors-1]，以及如何使用`factor()`函数创建因子。
+接着，我们将介绍包含一系列分类变量的`gss_cat`数据集供你实践。
+之后，你将使用该数据集练习调整因子的顺序和数值，最后我们将讨论有序因子的相关概念。
 
-[^factors-1]: They're also really important for modelling.
+[^factors-1]: 它们对建模也很重要。
 
 ### Prerequisites
 
-Base R provides some basic tools for creating and manipulating factors.
-We'll supplement these with the **forcats** package, which is part of the core tidyverse.
-It provides tools for dealing with **cat**egorical variables (and it's an anagram of factors!) using a wide range of helpers for working with factors.
+Base R 提供了一些用于创建和操作因子的基本工具。
+我们将通过**forcats**包来增强这些功能，该包是核心 tidyverse 的一部分。
+它提供了处理**分类**变量的工具（其名称是"factors"的变位词！），并包含多种辅助函数来操作因子。
 
 ```{r}
 #| label: setup
@@ -30,28 +31,28 @@ library(tidyverse)
 
 ## Factor basics
 
-Imagine that you have a variable that records month:
+假设您有一个记录月份的变量：
 
 ```{r}
 x1 <- c("Dec", "Apr", "Jan", "Mar")
 ```
 
-Using a string to record this variable has two problems:
+使用字符串来记录这个变量有两个问题：
 
-1.  There are only twelve possible months, and there's nothing saving you from typos:
+1.  只有十二个可能的月份，而且没有任何办法可以避免拼写错误：
 
     ```{r}
     x2 <- c("Dec", "Apr", "Jam", "Mar")
     ```
 
-2.  It doesn't sort in a useful way:
+2.  它没有以有用的方式排序：
 
     ```{r}
     sort(x1)
     ```
 
-You can fix both of these problems with a factor.
-To create a factor you must start by creating a list of the valid **levels**:
+您可以通过一个因子来解决这两个问题。
+要创建因子，您必须首先创建有效级别（**levels**）的列表：
 
 ```{r}
 month_levels <- c(
@@ -60,7 +61,7 @@ month_levels <- c(
 )
 ```
 
-Now you can create a factor:
+现在您可以创建一个因子：
 
 ```{r}
 y1 <- factor(x1, levels = month_levels)
@@ -69,40 +70,40 @@ y1
 sort(y1)
 ```
 
-And any values not in the level will be silently converted to NA:
+任何不在 level 中的值都将被默默地转换为 NA：
 
 ```{r}
 y2 <- factor(x2, levels = month_levels)
 y2
 ```
 
-This seems risky, so you might want to use `forcats::fct()` instead:
+这似乎有风险，因此您可能需要使用 `forcats::fct()` 代替：
 
 ```{r}
 #| error: true
 y2 <- fct(x2, levels = month_levels)
 ```
 
-If you omit the levels, they'll be taken from the data in alphabetical order:
+如果省略 levels，它们将按字母顺序从数据中获取：
 
 ```{r}
 factor(x1)
 ```
 
-Sorting alphabetically is slightly risky because not every computer will sort strings in the same way.
-So `forcats::fct()` orders by first appearance:
+按字母顺序排序有一点风险，因为并非每台计算机都会以相同的方式对字符串进行排序。
+因此 `forcats::fct()` 按首次出现排序：
 
 ```{r}
 fct(x1)
 ```
 
-If you ever need to access the set of valid levels directly, you can do so with `levels()`:
+如果您需要直接访问有效 levels 集，可以使用 `levels()` 来实现：
 
 ```{r}
 levels(y2)
 ```
 
-You can also create a factor when reading your data with readr with `col_factor()`:
+您还可以在使用 readr 和 `col_factor()` 读取数据时创建一个因子：
 
 ```{r}
 csv <- "
@@ -117,44 +118,44 @@ df$month
 
 ## General Social Survey
 
-For the rest of this chapter, we're going to use `forcats::gss_cat`.
-It's a sample of data from the [General Social Survey](https://gss.norc.org), a long-running US survey conducted by the independent research organization NORC at the University of Chicago.
-The survey has thousands of questions, so in `gss_cat` Hadley selected a handful that will illustrate some common challenges you'll encounter when working with factors.
+在本章后续部分，我们将使用 `forcats::gss_cat` 数据集。
+这是来自 [General Social Survey](https://gss.norc.org) 的一份数据样本，该调查是由芝加哥大学独立研究机构 NORC 长期开展的一项美国社会调查。
+该调查包含数千个问题，因此在 `gss_cat` 中，Hadley 精选了其中若干问题，用以展示处理因子时可能遇到的一些常见挑战。
 
 ```{r}
 gss_cat
 ```
 
-(Remember, since this dataset is provided by a package, you can get more information about the variables with `?gss_cat`.)
+（请记住，由于此数据集由包提供，您可以通过 `?gss_cat` 获取有关变量的更多信息。）
 
-When factors are stored in a tibble, you can't see their levels so easily.
-One way to view them is with `count()`:
+当因子存储在 tibble 中时，您无法轻易查看其 levels。
+一种查看方法是使用 `count()` 函数:
 
 ```{r}
 gss_cat |>
   count(race)
 ```
 
-When working with factors, the two most common operations are changing the order of the levels, and changing the values of the levels.
-Those operations are described in the sections below.
+在处理因子时，最常见的两种操作是更改 levels 的顺序和更改 levels 的值。
+这些操作将在以下章节中进行说明。
 
 ### Exercise
 
-1.  Explore the distribution of `rincome` (reported income).
-    What makes the default bar chart hard to understand?
-    How could you improve the plot?
+1.  探索 `rincome`（报告收入）的分布情况。
+    默认的条形图为何难以理解？
+    如何改进该图表？
 
-2.  What is the most common `relig` in this survey?
-    What's the most common `partyid`?
+2.  本调查中最常见的 `relig` 是什么？
+    最常见的 `partyid` 是什么？
 
-3.  Which `relig` does `denom` (denomination) apply to?
-    How can you find out with a table?
-    How can you find out with a visualization?
+3.  `denom` 适用于哪些 `relig`？
+    如何通过表格来查明？
+    如何通过可视化来查明？
 
 ## Modifying factor order {#sec-modifying-factor-order}
 
-It's often useful to change the order of the factor levels in a visualization.
-For example, imagine you want to explore the average number of hours spent watching TV per day across religions:
+在可视化中更改因子水平的顺序通常很有用。
+例如，假设你想探究不同宗教群体每天观看电视的平均小时数：
 
 ```{r}
 #| fig-alt: |
@@ -172,13 +173,13 @@ ggplot(relig_summary, aes(x = tvhours, y = relig)) +
   geom_point()
 ```
 
-It is hard to read this plot because there's no overall pattern.
-We can improve it by reordering the levels of `relig` using `fct_reorder()`.
-`fct_reorder()` takes three arguments:
+这张图表难以阅读，因为缺乏整体规律。
+我们可以通过使用 `fct_reorder()` 重新排序 `relig` 的 levels 来改进它。
+`fct_reorder()` 接受三个参数：
 
--   `f`, the factor whose levels you want to modify.
--   `x`, a numeric vector that you want to use to reorder the levels.
--   Optionally, `fun`, a function that's used if there are multiple values of `x` for each value of `f`. The default value is `median`.
+-   `f`, 需要修改 levels 的因子。
+-   `x`, 用于重新排序 levels 的数值向量。
+-   可选的, `fun`, 当每个 `f` 的值对应多个 `x` 值时使用的函数，默认值为 `median`。
 
 ```{r}
 #| fig-alt: |
@@ -189,10 +190,10 @@ ggplot(relig_summary, aes(x = tvhours, y = fct_reorder(relig, tvhours))) +
   geom_point()
 ```
 
-Reordering religion makes it much easier to see that people in the "Don't know" category watch much more TV, and Hinduism & Other Eastern religions watch much less.
+重新排序 religion 类别后，可以更清楚地看到 "Don't know" 类别的人看电视的时间多得多，而 Hinduism & Other Eastern 看电视的时间则少得多。
 
-As you start making more complicated transformations, we recommend moving them out of `aes()` and into a separate `mutate()` step.
-For example, you could rewrite the plot above as:
+当你开始进行更复杂的转换时，我们建议将其移出 `aes()`，并放入单独的 `mutate()` 步骤中。
+例如，你可以将上面的图重写为：
 
 ```{r}
 #| eval: false
@@ -205,7 +206,7 @@ relig_summary |>
   geom_point()
 ```
 
-What if we create a similar plot looking at how average age varies across reported income level?
+如果我们创建一个类似的图来观察平均年龄如何随报告的收入水平变化呢？
 
 ```{r}
 #| fig-alt: |
@@ -224,13 +225,13 @@ ggplot(rincome_summary, aes(x = age, y = fct_reorder(rincome, age))) +
   geom_point()
 ```
 
-Here, arbitrarily reordering the levels isn't a good idea!
-That's because `rincome` already has a principled order that we shouldn't mess with.
-Reserve `fct_reorder()` for factors whose levels are arbitrarily ordered.
+在这里，随意重新排序 levels 并不是一个好主意！
+这是因为 `rincome` 已经有一个合理且不应打乱的固有顺序。
+请将 `fct_reorder()` 保留用于那些 levels 是任意排序的因子。
 
-However, it does make sense to pull "Not applicable" to the front with the other special levels.
-You can use `fct_relevel()`.
-It takes a factor, `f`, and then any number of levels that you want to move to the front of the line.
+然而，将 "Not applicable" 与其他特殊 levels 一起移到前面是有意义的。
+你可以使用 `fct_relevel()`。
+它接受一个因子, `f`, 以及任意数量你想要移到最前端的 levels。
 
 ```{r}
 #| fig-alt: |
@@ -243,11 +244,11 @@ ggplot(rincome_summary, aes(x = age, y = fct_relevel(rincome, "Not applicable"))
   geom_point()
 ```
 
-Why do you think the average age for "Not applicable" is so high?
+你认为 "Not applicable" 类别的平均年龄为何如此之高？
 
-Another type of reordering is useful when you are coloring the lines on a plot.
-`fct_reorder2(f, x, y)` reorders the factor `f` by the `y` values associated with the largest `x` values.
-This makes the plot easier to read because the colors of the line at the far right of the plot will line up with the legend.
+当你为图表中的线条着色时，另一种重新排序方式很有用。
+`fct_reorder2(f, x, y)` 根据与最大 `x` 值相关联的 `y` 值来重新排序因子 `f`。
+这使得图表更易阅读，因为图表最右侧的线条颜色将与图例对齐。
 
 ```{r}
 #| layout-ncol: 2
@@ -283,8 +284,8 @@ ggplot(by_age, aes(x = age, y = prop, color = fct_reorder2(marital, age, prop)))
   labs(color = "marital") 
 ```
 
-Finally, for bar plots, you can use `fct_infreq()` to order levels in decreasing frequency: this is the simplest type of reordering because it doesn't need any extra variables.
-Combine it with `fct_rev()` if you want them in increasing frequency so that in the bar plot largest values are on the right, not the left.
+最后，对于条形图，你可以使用 `fct_infreq()` 按频率降序排列水平：这是最简单的重新排序类型，因为它不需要任何额外变量。
+如果你想按频率升序排列，以便条形图中最大值在右侧而非左侧，可以将其与 `fct_rev()` 结合使用。
 
 ```{r}
 #| fig-alt: |
@@ -299,28 +300,28 @@ gss_cat |>
 
 ### Exercises
 
-1.  There are some suspiciously high numbers in `tvhours`.
-    Is the mean a good summary?
+1.  `tvhours` 中存在一些异常高的数值。
+    平均值是一个好的概括指标吗？
 
-2.  For each factor in `gss_cat` identify whether the order of the levels is arbitrary or principled.
+2.  对于 `gss_cat` 中的每个因子，判断其 levels 的顺序是任意的还是有原则的。
 
-3.  Why did moving "Not applicable" to the front of the levels move it to the bottom of the plot?
+3.  为什么将 "Not applicable" 移到 levels 的前端会使其在图中的位置移到底部？
 
 ## Modifying factor levels
 
-More powerful than changing the orders of the levels is changing their values.
-This allows you to clarify labels for publication, and collapse levels for high-level displays.
-The most general and powerful tool is `fct_recode()`.
-It allows you to recode, or change, the value of each level.
-For example, take the `partyid` variable from the `gss_cat` data frame:
+比改变 levels 顺序更强大的是改变它们的值。
+这可以让你在发表时清晰标注，或在高层级展示中合并 levels。
+最通用且强大的工具是 `fct_recode()`。
+它允许你对每个 level 进行重新编码或更改其值。
+例如，以 `gss_cat` 数据框中的 `partyid` 变量为例：
 
 ```{r}
 gss_cat |> count(partyid)
 ```
 
-The levels are terse and inconsistent.
-Let's tweak them to be longer and use a parallel construction.
-Like most rename and recoding functions in the tidyverse, the new values go on the left and the old values go on the right:
+这些 levels 的表述简略且不一致。
+让我们将其调整为更详细且结构统一的表达方式。
+与 tidyverse 中大多数重命名和重新编码的函数类似，新值位于左侧，旧值位于右侧：
 
 ```{r}
 gss_cat |>
@@ -337,9 +338,9 @@ gss_cat |>
   count(partyid)
 ```
 
-`fct_recode()` will leave the levels that aren't explicitly mentioned as is, and will warn you if you accidentally refer to a level that doesn't exist.
+`fct_recode()` 会保留未明确提及的原有 levels 不变，并在意外引用不存在的 level 时发出警告。
 
-To combine groups, you can assign multiple old levels to the same new level:
+若要合并分组，可以将多个旧 levels 分配给同一个新 level：
 
 ```{r}
 #| results: false
@@ -359,10 +360,10 @@ gss_cat |>
   )
 ```
 
-Use this technique with care: if you group together categories that are truly different you will end up with misleading results.
+使用此技巧时需谨慎：如果将确实不同的类别合并，可能会导致结果产生误导。
 
-If you want to collapse a lot of levels, `fct_collapse()` is a useful variant of `fct_recode()`.
-For each new variable, you can provide a vector of old levels:
+如果你需要合并大量 levels，`fct_collapse()` 是 `fct_recode()` 的一个实用变体。
+对于每个新变量，你可以提供一个包含旧 levels 的向量：
 
 ```{r}
 gss_cat |>
@@ -377,9 +378,9 @@ gss_cat |>
   count(partyid)
 ```
 
-Sometimes you just want to lump together the small groups to make a plot or table simpler.
-That's the job of the `fct_lump_*()` family of functions.
-`fct_lump_lowfreq()` is a simple starting point that progressively lumps the smallest groups categories into "Other", always keeping "Other" as the smallest category.
+有时，你只想将小组别合并以使图表或表格更简洁。
+这正是 `fct_lump_*()` 系列函数的功能所在。
+`fct_lump_lowfreq()` 是一个简单的起点，它会逐步将最小的组别类别合并为 "Other"，并始终将 "Other" 保持为最小的类别。
 
 ```{r}
 gss_cat |>
@@ -387,8 +388,8 @@ gss_cat |>
   count(relig)
 ```
 
-In this case it's not very helpful: it is true that the majority of Americans in this survey are Protestant, but we'd probably like to see some more details!
-Instead, we can use the `fct_lump_n()` to specify that we want exactly 10 groups:
+但在此案例中，这种方法帮助不大：虽然调查中大多数美国人确实信奉新教，但我们可能希望看到更多细节！
+相反，我们可以使用 `fct_lump_n()` 来明确指定恰好需要 10 个分组：
 
 ```{r}
 gss_cat |>
@@ -396,44 +397,45 @@ gss_cat |>
   count(relig, sort = TRUE)
 ```
 
-Read the documentation to learn about `fct_lump_min()` and `fct_lump_prop()` which are useful in other cases.
+请查阅文档以了解 `fct_lump_min()` 和 `fct_lump_prop()`，它们在其他情况下非常有用。
 
 ### Exercises
 
-1.  How have the proportions of people identifying as Democrat, Republican, and Independent changed over time?
+1.  自我认同为 Democrat、Republican 和 Independent 的比例随时间发生了怎样的变化？
 
-2.  How could you collapse `rincome` into a small set of categories?
+2.  如何将 `rincome` 合并成少量类别？
 
-3.  Notice there are 9 groups (excluding other) in the `fct_lump` example above.
-    Why not 10?
-    (Hint: type `?fct_lump`, and find the default for the argument `other_level` is "Other".)
+3.  注意到上面的 `fct_lump` 示例中有 9 个分组（不包括 other）。
+    为什么不是 10 个？
+    （提示：输入 `?fct_lump`，会发现参数 `other_level` 的默认值是 "Other"。）
 
 ## Ordered factors {#sec-ordered-factors}
 
-Before we go on, there's a special type of factor that needs to be mentioned briefly: ordered factors.
-Ordered factors, created with `ordered()`, imply a strict ordering and equal distance between levels: the first level is "less than" the second level by the same amount that the second level is "less than" the third level, and so on.
-You can recognize them when printing because they use `<` between the factor levels:
+在我们继续之前，需要简要提及一种特殊的因子类型：有序因子。
+有序因子通过 `ordered()` 创建，意味着各 levels 之间存在严格的顺序和等距关系：第一个 level 比第二个 level “小”的程度，与第二个 level 比第三个 level “小”的程度相同，依此类推。
+打印时可以识别它们，因为它们在因子水平之间使用 `<` 符号：
 
 ```{r}
 ordered(c("a", "b", "c"))
 ```
 
-In practice, `ordered()` factors behave very similarly to regular factors.
-There are only two places where you might notice different behavior:
+实际上，`ordered()` 因子的行为与常规因子非常相似。
+只有在两个地方你可能会注意到不同的行为：
 
--   If you map an ordered factor to color or fill in ggplot2, it will default to `scale_color_viridis()`/`scale_fill_viridis()`, a color scale that implies a ranking.
--   If you use an ordered function in a linear model, it will use "polygonal contrasts". These are mildly useful, but you are unlikely to have heard of them unless you have a PhD in Statistics, and even then you probably don't routinely interpret them. If you want to learn more, we recommend `vignette("contrasts", package = "faux")` by Lisa DeBruine.
+-   如果在 ggplot2 中将有序因子映射到颜色或填充，它将默认使用 `scale_color_viridis()`/`scale_fill_viridis()`，这是一种暗示排序的颜色标度。
+-   如果在线性模型中使用有序函数，它将使用“多边形对比”。这些对比略有用途，但除非你拥有统计学博士学位，否则可能从未听说过它们；即使有博士学位，你可能也不会常规地解释它们。如果你想了解更多，我们推荐 Lisa DeBruine 的 `vignette("contrasts", package = "faux")`。
 
-Given the arguable utility of these differences, we don't generally recommend using ordered factors.
+鉴于这些差异的效用存在争议，我们通常不建议使用有序因子。
 
 ## Summary
 
-This chapter introduced you to the handy forcats package for working with factors, introducing you to the most commonly used functions.
-forcats contains a wide range of other helpers that we didn't have space to discuss here, so whenever you're facing a factor analysis challenge that you haven't encountered before, I highly recommend skimming the [reference index](https://forcats.tidyverse.org/reference/index.html) to see if there's a canned function that can help solve your problem.
+本章向你介绍了处理因子的实用工具——forcats包，并介绍了其中最常用的函数。
+forcats 还包含许多其他辅助函数，因篇幅所限未能详述。因
+此，当你遇到之前未接触过的因子分析挑战时，强烈建议浏览 [reference index](https://forcats.tidyverse.org/reference/index.html)，查看是否有现成的函数能帮助你解决问题。
 
-If you want to learn more about factors after reading this chapter, we recommend reading Amelia McNamara and Nicholas Horton's paper, [*Wrangling categorical data in R*](https://peerj.com/preprints/3163/).
-This paper lays out some of the history discussed in [*stringsAsFactors: An unauthorized biography*](https://simplystatistics.org/posts/2015-07-24-stringsasfactors-an-unauthorized-biography/) and [*stringsAsFactors = \<sigh\>*](https://notstatschat.tumblr.com/post/124987394001/stringsasfactors-sigh), and compares the tidy approaches to categorical data outlined in this book with base R methods.
-An early version of the paper helped motivate and scope the forcats package; thanks Amelia & Nick!
+如果在阅读本章后希望进一步了解因子，推荐阅读 Amelia McNamara 和 Nicholas Horton 的论文 [*Wrangling categorical data in R*](https://peerj.com/preprints/3163/)。
+该论文梳理了 [*stringsAsFactors: An unauthorized biography*](https://simplystatistics.org/posts/2015-07-24-stringsasfactors-an-unauthorized-biography/) 和 [*stringsAsFactors = \<sigh\>*](https://notstatschat.tumblr.com/post/124987394001/stringsasfactors-sigh) 中讨论的部分历史背景，并将本书概述的分类数据整洁方法与 base R 方法进行了比较。
+该论文的早期版本对 forcats 包的开发动机和范围界定起到了推动作用; 感谢 Amelia 和 Nick！
 
-In the next chapter we'll switch gears to start learning about dates and times in R.
-Dates and times seem deceptively simple, but as you'll soon see, the more you learn about them, the more complex they seem to get!
+下一章我们将转向新的主题，开始学习 R 中的日期与时间处理。
+日期和时间看似简单，但正如你将很快发现的，对它们了解得越多，就越能体会到其复杂性！

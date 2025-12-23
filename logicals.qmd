@@ -49,7 +49,7 @@ df |>
 
 创建逻辑向量的一种非常常见的方法是通过数字比较 `<`, `<=`, `>`, `>=`, `!=`, `==`。
 到目前为止，我们主要在 `filter()` 中瞬时创建了逻辑变量 --- 它们被计算，使用，然后丢弃。
-For example, the following filter finds all daytime departures that arrive roughly on time: 例如，下面的 filter 找出所有白天出发且基本准点到达的航班：
+例如，下面的 filter 找出所有白天出发且基本准点到达的航班：
 
 ```{r}
 flights |> 
