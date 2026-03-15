@@ -32,7 +32,7 @@ Try to translate R for Data Science (the second edition) into Simplified Chinese
 | 17 Dates and times               | ✔        | 2025.12.22 | [TigerZ](https://github.com/ZhengTiger) |
 | 18 Missing values                | ✔        | 2025.12.22 | [TigerZ](https://github.com/ZhengTiger) |
 | 19 Joins                         | ✔        | 2025.12.23 | [TigerZ](https://github.com/ZhengTiger) |
-| 20 Spreadsheets                  |          |            |                                         |
+| 20 Spreadsheets                  | ✔        | 2026.3.12  | [TigerZ](https://github.com/ZhengTiger) |
 | 21 Databases                     |          |            |                                         |
 | 22 Arrow                         |          |            |                                         |
 | 23 Hierarchical data             |          |            |                                         |

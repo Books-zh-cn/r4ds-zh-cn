@@ -6,16 +6,15 @@
 source("_common.R")
 ```
 
-In this part of the book, you'll learn how to import a wider range of data into R, as well as how to get it into a form useful form for analysis.
-Sometimes this is just a matter of calling a function from the appropriate data import package.
-But in more complex cases it might require both tidying and transformation in order to get to the tidy rectangle that you'd prefer to work with.
+在这一部分中，你将学习如何将更广泛的数据导入R，以及如何将其转换为适合分析的格式。
+有时只需调用相应数据导入包中的函数即可完成。
+但在更复杂的情况下，可能需要同时进行数据清洗和转换，才能得到你更希望使用的规整矩形数据。
 
 ```{r}
 #| label: fig-ds-import
 #| echo: false
 #| fig-cap: |
-#|   Data import is the beginning of the data science process; without
-#|   data you can't do data science!
+#|   数据导入是数据科学过程的开始；没有数据，你就无法进行数据科学！
 #| fig-alt: |
 #|   Our data science model with import highlighted in blue.
 #| out.width: NULL
@@ -23,19 +22,19 @@ But in more complex cases it might require both tidying and transformation in or
 knitr::include_graphics("diagrams/data-science/import.png", dpi = 270)
 ```
 
-In this part of the book you'll learn how to access data stored in the following ways:
+在本部分中，你将学习如何访问通过以下几种方式存储的数据：
 
--   In @sec-import-spreadsheets, you'll learn how to import data from Excel spreadsheets and Google Sheets.
+-   在 @sec-import-spreadsheets 中, 你将学习如何从 Excel spreadsheets 和 Google Sheets 中导入数据。
 
--   In @sec-import-databases, you'll learn about getting data out of a database and into R (and you'll also learn a little about how to get data out of R and into a database).
+-   在 @sec-import-databases 中, 你将学习如何从数据库中提取数据到 R 中（同时你也会了解一些如何将数据从 R 存入数据库的方法）。
 
--   In @sec-arrow, you'll learn about Arrow, a powerful tool for working with out-of-memory data, particularly when it's stored in the parquet format.
+-   在 @sec-arrow 中, 你将学习 Arrow，这是一个处理内存外数据的强大工具，特别是当数据以 parquet 格式存储时。
 
--   In @sec-rectangling, you'll learn how to work with hierarchical data, including the deeply nested lists produced by data stored in the JSON format.
+-   在 @sec-rectangling 中, 你将学习如何处理分层数据，包括 JSON 格式存储所产生的深度嵌套列表。
 
--   In @sec-scraping, you'll learn web "scraping", the art and science of extracting data from web pages.
+-   在 @sec-scraping 中, 你将学习网络"爬取"，即从网页中提取数据的艺术与科学。
 
-There are two important tidyverse packages that we don't discuss here: haven and xml2.
-If you're working with data from SPSS, Stata, and SAS files, check out the **haven** package, <https://haven.tidyverse.org>.
-If you're working with XML data, check out the **xml2** package, <https://xml2.r-lib.org>.
-Otherwise, you'll need to do some research to figure which package you'll need to use; google is your friend here 😃.
+有两个重要的 tidyverse 包我们在此不做讨论：haven 和 xml2。
+如果你正在处理来自 SPSS、Stata 和 SAS 文件的数据，请查阅 **haven** 包，<https://haven.tidyverse.org>。
+如果你正在处理 XML 数据，请查阅 **xml2** 包，<https://xml2.r-lib.org>。
+除此之外，你可能需要自行研究来确定需要使用的包；谷歌会是你的好帮手😃。

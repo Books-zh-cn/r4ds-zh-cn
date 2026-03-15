@@ -7,22 +7,22 @@ source("_common.R")
 
 ## Introduction
 
-In @sec-data-import you learned about importing data from plain text files like `.csv` and `.tsv`.
-Now it's time to learn how to get data out of a spreadsheet, either an Excel spreadsheet or a Google Sheet.
-This will build on much of what you've learned in @sec-data-import, but we will also discuss additional considerations and complexities when working with data from spreadsheets.
+在 @sec-data-import 中，你学习了如何从纯文本文件（如`.csv`和`.tsv`）导入数据。
+现在是时候学习如何从电子表格（无论是Excel电子表格还是Google Sheets）中获取数据了。
+这部分内容将建立在你在 @sec-data-import 中所学知识的基础上，但我们也将讨论处理电子表格数据时需要考虑的其他事项和复杂性。
 
-If you or your collaborators are using spreadsheets for organizing data, we strongly recommend reading the paper "Data Organization in Spreadsheets" by Karl Broman and Kara Woo: <https://doi.org/10.1080/00031305.2017.1375989>.
-The best practices presented in this paper will save you much headache when you import data from a spreadsheet into R to analyze and visualize.
+如果你或你的合作者正在使用电子表格来组织数据，我们强烈推荐阅读Karl Broman和Kara Woo撰写的论文"Data Organization in Spreadsheets"：<https://doi.org/10.1080/00031305.2017.1375989>。
+这篇论文中提出的最佳实践将为你后续将电子表格数据导入R进行分析和可视化时省去大量麻烦。
 
 ## Excel
 
-Microsoft Excel is a widely used spreadsheet software program where data are organized in worksheets inside of spreadsheet files.
+Microsoft Excel是一款广泛使用的电子表格软件程序，数据被组织在电子表格文件内的工作表中。
 
 ### Prerequisites
 
-In this section, you'll learn how to load data from Excel spreadsheets in R with the **readxl** package.
-This package is non-core tidyverse, so you need to load it explicitly, but it is installed automatically when you install the tidyverse package.
-Later, we'll also use the writexl package, which allows us to create Excel spreadsheets.
+在本节中，你将学习如何使用**readxl**包将Excel电子表格中的数据加载到R中。
+这个包不属于tidyverse的核心包，因此你需要显式加载它，但当你安装tidyverse包时，它会被自动安装。
+稍后，我们还将使用writexl包，它允许我们创建Excel电子表格。
 
 ```{r}
 #| message: false
@@ -34,25 +34,25 @@ library(writexl)
 
 ### Getting started
 
-Most of readxl's functions allow you to load Excel spreadsheets into R:
+readxl的大部分函数允许你将Excel电子表格加载到R中：
 
--   `read_xls()` reads Excel files with `xls` format.
--   `read_xlsx()` read Excel files with `xlsx` format.
--   `read_excel()` can read files with both `xls` and `xlsx` format. It guesses the file type based on the input.
+-   `read_xls()` 用于读取 `xls` 格式的Excel文件。
+-   `read_xlsx()` 用于读取 `xlsx` 格式的Excel文件。
+-   `read_excel()` 可以读取 `xls` 和 `xlsx` 两种格式的文件。它会根据输入自动判断文件类型。
 
-These functions all have similar syntax just like other functions we have previously introduced for reading other types of files, e.g., `read_csv()`, `read_table()`, etc.
-For the rest of the chapter we will focus on using `read_excel()`.
+这些函数的语法与我们之前介绍过的用于读取其他类型文件（例如 `read_csv()`、`read_table()` 等）的函数非常相似。
+在本章的剩余部分，我们将重点介绍如何使用`read_excel()`。
 
 ### Reading Excel spreadsheets {#sec-reading-spreadsheets-excel}
 
-@fig-students-excel shows what the spreadsheet we're going to read into R looks like in Excel.
+@fig-students-excel 展示了我们将要读入R的电子表格在Excel中的样子。
 
 ```{r}
 #| label: fig-students-excel
 #| echo: false
 #| fig-width: 5
 #| fig-cap: |
-#|   Spreadsheet called students.xlsx in Excel.
+#|   Excel 中名为 Students.xlsx 的电子表格。
 #| fig-alt: |
 #|   A look at the students spreadsheet in Excel. The spreadsheet contains 
 #|   information on 6 students, their ID, full name, favourite food, meal plan, 
@@ -61,23 +61,23 @@ For the rest of the chapter we will focus on using `read_excel()`.
 knitr::include_graphics("screenshots/import-spreadsheets-students.png")
 ```
 
-The first argument to `read_excel()` is the path to the file to read.
+`read_excel()` 的第一个参数是要读取文件的路径。
 
 ```{r}
 students <- read_excel("data/students.xlsx")
 ```
 
-`read_excel()` will read the file in as a tibble.
+`read_excel()` 会将文件读取为tibble
 
 ```{r}
 students
 ```
 
-We have six students in the data and five variables on each student.
-However there are a few things we might want to address in this dataset:
+数据中包含六名学生和每个学生的五个变量。
+然而，在这个数据集中，我们可能需要处理几个问题：
 
-1.  The column names are all over the place.
-    You can provide column names that follow a consistent format; we recommend `snake_case` using the `col_names` argument.
+1.  列名格式不统一。
+    你可以通过提供列名遵循一致的格式；我们推荐`snake_case`命名法使用 `col_names` 参数。
 
     ```{r}
     #| include: false
@@ -104,9 +104,9 @@ However there are a few things we might want to address in this dataset:
     )
     ```
 
-    Unfortunately, this didn't quite do the trick.
-    We now have the variable names we want, but what was previously the header row now shows up as the first observation in the data.
-    You can explicitly skip that row using the `skip` argument.
+    遗憾的是，这招并不完全奏效。
+    虽然我们得到了想要的变量名，但之前作为标题行（表头）的内容现在却显示为数据中的第一条观测值。
+    你可以使用 `skip` 参数来明确跳过那一行。
 
     ```{r}
     read_excel(
@@ -116,9 +116,9 @@ However there are a few things we might want to address in this dataset:
     )
     ```
 
-2.  In the `favourite_food` column, one of the observations is `N/A`, which stands for "not available" but it's currently not recognized as an `NA` (note the contrast between this `N/A` and the age of the fourth student in the list).
-    You can specify which character strings should be recognized as `NA`s with the `na` argument.
-    By default, only `""` (empty string, or, in the case of reading from a spreadsheet, an empty cell or a cell with the formula `=NA()`) is recognized as an `NA`.
+2.  在 `favourite_food` 列中，有一个观测值是 `N/A`，它代表“不可用”（not available），但目前它并未被识别为 `NA`（请注意此处的 `N/A` 与列表中第四名学生年龄的对比）。
+    你可以使用 `na` 参数来指定哪些字符串应被识别为 `NA`s。
+    默认情况下，只有 `""`（空字符串，或者在从电子表格读取的情况下，指空单元格或包含公式 `=NA()` 的单元格）会被识别为 `NA`。
 
     ```{r}
     read_excel(
@@ -129,10 +129,10 @@ However there are a few things we might want to address in this dataset:
     )
     ```
 
-3.  One other remaining issue is that `age` is read in as a character variable, but it really should be numeric.
-    Just like with `read_csv()` and friends for reading data from flat files, you can supply a `col_types` argument to `read_excel()` and specify the column types for the variables you read in.
-    The syntax is a bit different, though.
-    Your options are `"skip"`, `"guess"`, `"logical"`, `"numeric"`, `"date"`, `"text"` or `"list"`.
+3.  另一个遗留问题是 `age`（年龄）被读取为字符型变量，但它本应是数值型。
+    与用于从平面文件读取数据的 `read_csv()` 及其同类函数一样，你可以向 `read_excel()` 提供一个 `col_types` 参数，并指定所读取变量的列类型。
+    不过，语法稍有不同。
+    你可选的类型有：`"skip"`, `"guess"`, `"logical"`, `"numeric"`, `"date"`, `"text"` or `"list"`.
 
     ```{r}
     read_excel(
@@ -144,9 +144,9 @@ However there are a few things we might want to address in this dataset:
     )
     ```
 
-    However, this didn't quite produce the desired result either.
-    By specifying that `age` should be numeric, we have turned the one cell with the non-numeric entry (which had the value `five`) into an `NA`.
-    In this case, we should read age in as `"text"` and then make the change once the data is loaded in R.
+    然而，这样操作也未能完全达到预期效果。
+    通过指定 `age` 应为数值型，我们将那个包含非数字条目（值为 `five`）的单元格转换成了 `NA`。
+    在这种情况下，我们应该先将 age 作为 `"text"` 读取进来，待数据加载到 R 中后再进行转换。
 
     ```{r}
     students <- read_excel(
@@ -166,28 +166,28 @@ However there are a few things we might want to address in this dataset:
     students
     ```
 
-It took us multiple steps and trial-and-error to load the data in exactly the format we want, and this is not unexpected.
-Data science is an iterative process, and the process of iteration can be even more tedious when reading data in from spreadsheets compared to other plain text, rectangular data files because humans tend to input data into spreadsheets and use them not just for data storage but also for sharing and communication.
+我们花了多个步骤，通过反复试验才将数据加载成我们想要的精确格式，这并不出乎意料。
+数据科学本身就是一个迭代的过程，而从电子表格读取数据时，这个迭代过程可能比处理其他纯文本、矩形数据文件更为繁琐，因为人们倾向于将数据输入到电子表格中，并不仅将其用于数据存储，还用于共享和交流。
 
-There is no way to know exactly what the data will look like until you load it and take a look at it.
-Well, there is one way, actually.
-You can open the file in Excel and take a peek.
-If you're going to do so, we recommend making a copy of the Excel file to open and browse interactively while leaving the original data file untouched and reading into R from the untouched file.
-This will ensure you don't accidentally overwrite anything in the spreadsheet while inspecting it.
-You should also not be afraid of doing what we did here: load the data, take a peek, make adjustments to your code, load it again, and repeat until you're happy with the result.
+在你加载数据并查看之前，你无法确切知道数据会是什么样子。
+嗯，实际上有一种方法可以预先了解。
+你可以在Excel中打开文件瞧一瞧。
+如果你打算这样做，我们建议先复制一份Excel文件用于打开和交互式浏览，同时保留原始数据文件不动，并从这份未修改的文件中将数据读入R。
+这样可以确保你在查看过程中不会意外地覆盖电子表格中的任何内容。
+同时，你也不应畏惧我们在这里所做的事情：加载数据，查看一番，调整代码，再次加载，如此反复，直到你对结果满意为止。
 
 ### Reading worksheets
 
-An important feature that distinguishes spreadsheets from flat files is the notion of multiple sheets, called worksheets.
-@fig-penguins-islands shows an Excel spreadsheet with multiple worksheets.
-The data come from the **palmerpenguins** package.
-Each worksheet contains information on penguins from a different island where data were collected.
+电子表格与平面文件的一个重要区别在于其包含多个工作表（worksheets）的概念。
+@fig-penguins-islands 展示了一个包含多个工作表的Excel电子表格。
+这些数据来自 **palmerpenguins** 包。
+每个工作表包含来自不同数据收集岛屿的企鹅信息。
 
 ```{r}
 #| label: fig-penguins-islands
 #| echo: false
 #| fig-cap: |
-#|   Spreadsheet called penguins.xlsx in Excel containing three worksheets.
+#|   Excel 中名为 penguins.xlsx 的电子表格包含三个工作表。
 #| fig-alt: |
 #|   A look at the penguins spreadsheet in Excel. The spreadsheet contains has 
 #|   three worksheets: Torgersen Island, Biscoe Island, and Dream Island.
@@ -195,14 +195,14 @@ Each worksheet contains information on penguins from a different island where da
 knitr::include_graphics("screenshots/import-spreadsheets-penguins-islands.png")
 ```
 
-You can read a single worksheet from a spreadsheet with the `sheet` argument in `read_excel()`.
-The default, which we've been relying on up until now, is the first sheet.
+你可以使用 `read_excel()` 中的 `sheet` 参数从电子表格中读取单个工作表。
+默认情况下（我们一直沿用至今），读取的是第一个工作表。
 
 ```{r}
 read_excel("data/penguins.xlsx", sheet = "Torgersen Island")
 ```
 
-Some variables that appear to contain numerical data are read in as characters due to the character string `"NA"` not being recognized as a true `NA`.
+由于字符串 `"NA"` 未被识别为真正的 `NA` 值，一些看似包含数值数据的变量会被读取为字符型。
 
 ```{r}
 penguins_torgersen <- read_excel("data/penguins.xlsx", sheet = "Torgersen Island", na = "NA")
@@ -210,21 +210,21 @@ penguins_torgersen <- read_excel("data/penguins.xlsx", sheet = "Torgersen Island
 penguins_torgersen
 ```
 
-Alternatively, you can use `excel_sheets()` to get information on all worksheets in an Excel spreadsheet, and then read the one(s) you're interested in.
+另外，你也可以使用 `excel_sheets()` 来获取Excel电子表格中所有工作表的信息，然后读取你感兴趣的一个或多个。
 
 ```{r}
 excel_sheets("data/penguins.xlsx")
 ```
 
-Once you know the names of the worksheets, you can read them in individually with `read_excel()`.
+一旦知道了工作表的名称，就可以使用 `read_excel()` 分别读取它们。
 
 ```{r}
 penguins_biscoe <- read_excel("data/penguins.xlsx", sheet = "Biscoe Island", na = "NA")
 penguins_dream  <- read_excel("data/penguins.xlsx", sheet = "Dream Island", na = "NA")
 ```
 
-In this case the full penguins dataset is spread across three worksheets in the spreadsheet.
-Each worksheet has the same number of columns but different numbers of rows.
+在这个例子中，完整的企鹅数据集分布在电子表格的三个工作表中。
+每个工作表具有相同的列数，但行数不同。
 
 ```{r}
 dim(penguins_torgersen)
@@ -232,25 +232,25 @@ dim(penguins_biscoe)
 dim(penguins_dream)
 ```
 
-We can put them together with `bind_rows()`.
+我们可以使用 `bind_rows()` 将它们合并在一起。
 
 ```{r}
 penguins <- bind_rows(penguins_torgersen, penguins_biscoe, penguins_dream)
 penguins
 ```
 
-In @sec-iteration we'll talk about ways of doing this sort of task without repetitive code.
+在 @sec-iteration 中，我们将讨论如何以更简洁的代码完成此类任务，避免重复编写。
 
 ### Reading part of a sheet
 
-Since many use Excel spreadsheets for presentation as well as for data storage, it's quite common to find cell entries in a spreadsheet that are not part of the data you want to read into R.
-@fig-deaths-excel shows such a spreadsheet: in the middle of the sheet is what looks like a data frame but there is extraneous text in cells above and below the data.
+由于许多人将Excel电子表格既用于数据展示也用于数据存储，因此经常发现电子表格中的某些单元格内容并非你想要读入R的数据的一部分。
+@fig-deaths-excel 展示了这样一个电子表格：工作表中间看起来像一个数据框，但数据上下的单元格中却存在无关的文本。
 
 ```{r}
 #| label: fig-deaths-excel
 #| echo: false
 #| fig-cap: |
-#|   Spreadsheet called deaths.xlsx in Excel.
+#|   Excel 中名为“death.xlsx”的电子表格。
 #| fig-alt: |
 #|   A look at the deaths spreadsheet in Excel. The spreadsheet has four rows 
 #|   on top that contain non-data information; the text 'For the same of 
@@ -265,9 +265,9 @@ Since many use Excel spreadsheets for presentation as well as for data storage, 
 knitr::include_graphics("screenshots/import-spreadsheets-deaths.png")
 ```
 
-This spreadsheet is one of the example spreadsheets provided in the readxl package.
-You can use the `readxl_example()` function to locate the spreadsheet on your system in the directory where the package is installed.
-This function returns the path to the spreadsheet, which you can use in `read_excel()` as usual.
+这个电子表格是readxl包提供的示例电子表格之一。
+你可以使用 `readxl_example()` 函数在你的系统上定位该电子表格在包安装目录中的位置。
+这个函数会返回电子表格的路径，你可以像往常一样在 `read_excel()` 中使用该路径。
 
 ```{r}
 deaths_path <- readxl_example("deaths.xlsx")
@@ -275,16 +275,14 @@ deaths <- read_excel(deaths_path)
 deaths
 ```
 
-The top three rows and the bottom four rows are not part of the data frame.
-It's possible to eliminate these extraneous rows using the `skip` and `n_max` arguments, but we recommend using cell ranges.
-In Excel, the top left cell is `A1`.
-As you move across columns to the right, the cell label moves down the alphabet, i.e.
-`B1`, `C1`, etc.
-And as you move down a column, the number in the cell label increases, i.e.
-`A2`, `A3`, etc.
+最上面三行和最下面四行不属于数据框的一部分。
+可以使用 `skip` 和 `n_max` 参数来排除这些无关的行，但我们更推荐使用单元格区域。
+在Excel中，左上角的单元格是 `A1`。
+当您向右移动列时，单元格标签会按字母顺序变化，即 `B1`, `C1` 等。
+而当您向下移动行时，单元格标签中的数字会增加，即 `A2`, `A3` 等。
 
-Here the data we want to read in starts in cell `A5` and ends in cell `F15`.
-In spreadsheet notation, this is `A5:F15`, which we supply to the `range` argument:
+这里，我们想要读取的数据起始于单元格 `A5`，结束于单元格 `F15`。
+在电子表格表示法中，这即 `A5:F15`，我们将其提供给 `range` 参数：
 
 ```{r}
 read_excel(deaths_path, range = "A5:F15")
@@ -292,45 +290,45 @@ read_excel(deaths_path, range = "A5:F15")
 
 ### Data types
 
-In CSV files, all values are strings.
-This is not particularly true to the data, but it is simple: everything is a string.
+在CSV文件中，所有值都是字符串。
+这对数据本身来说并不完全真实，但它很简单：一切都是字符串。
 
-The underlying data in Excel spreadsheets is more complex.
-A cell can be one of four things:
+Excel电子表格中的底层数据则更为复杂。
+一个单元格可以是以下四种类型之一：
 
--   A boolean, like `TRUE`, `FALSE`, or `NA`.
+-   A boolean, 例如 `TRUE`, `FALSE`, 或 `NA`.
 
--   A number, like "10" or "10.5".
+-   A number, 例如 "10" 或 "10.5".
 
--   A datetime, which can also include time like "11/1/21" or "11/1/21 3:00 PM".
+-   A datetime, 也可以包含时间，例如 "11/1/21" 或 "11/1/21 3:00 PM".
 
--   A text string, like "ten".
+-   A text string, 例如 "ten".
 
-When working with spreadsheet data, it's important to keep in mind that the underlying data can be very different than what you see in the cell.
-For example, Excel has no notion of an integer.
-All numbers are stored as floating points, but you can choose to display the data with a customizable number of decimal points.
-Similarly, dates are actually stored as numbers, specifically the number of seconds since January 1, 1970.
-You can customize how you display the date by applying formatting in Excel.
-Confusingly, it's also possible to have something that looks like a number but is actually a string (e.g., type `'10` into a cell in Excel).
+处理电子表格数据时，务必记住底层数据可能与您在单元格中看到的截然不同。
+例如，Excel没有整数的概念。
+所有数字都存储为浮点数，但您可以选择以自定义小数位数显示数据。
+类似地，日期实际上存储为数字，具体来说是自1970年1月1日以来的秒数。
+您可以通过在Excel中应用格式来自定义日期的显示方式。
+令人困惑的是，也可能存在看起来像数字但实际上是字符串的情况（例如，在Excel的单元格中输入 `'10`）。
 
-These differences between how the underlying data are stored vs. how they're displayed can cause surprises when the data are loaded into R.
-By default readxl will guess the data type in a given column.
-A recommended workflow is to let readxl guess the column types, confirm that you're happy with the guessed column types, and if not, go back and re-import specifying `col_types` as shown in @sec-reading-spreadsheets-excel.
+底层数据存储方式与数据显示方式之间的这些差异，可能会导致数据加载到R时出现意外情况。
+默认情况下，readxl会猜测给定列的数据类型。
+一个推荐的工作流程是让readxl猜测列类型，确认您对猜测的列类型是否满意，如果不满意，则返回并重新导入，同时指定 `col_types`，如 @sec-reading-spreadsheets-excel 所示。
 
-Another challenge is when you have a column in your Excel spreadsheet that has a mix of these types, e.g., some cells are numeric, others text, others dates.
-When importing the data into R readxl has to make some decisions.
-In these cases you can set the type for this column to `"list"`, which will load the column as a list of length 1 vectors, where the type of each element of the vector is guessed.
+另一个挑战是当您的Excel电子表格中有一列混合了这些类型时，例如，某些单元格是数字，其他是文本，还有一些是日期。
+在将数据导入R时，readxl必须做出一些决定。在
+这些情况下，您可以将此列的类型设置为 `"list"`，这将把该列加载为一个长度为1的向量列表，其中每个向量元素的类型是被猜测出来的。
 
 ::: callout-note
-Sometimes data is stored in more exotic ways, like the color of the cell background, or whether or not the text is bold.
-In such cases, you might find the [tidyxl package](https://nacnudus.github.io/tidyxl/) useful.
-See <https://nacnudus.github.io/spreadsheet-munging-strategies/> for more on strategies for working with non-tabular data from Excel.
+有时数据以更特殊的方式存储，例如单元格背景的颜色，或者文本是否为粗体。
+在这种情况下，您可能会发现 [tidyxl package](https://nacnudus.github.io/tidyxl/) 包 很有用。
+有关处理来自Excel的非表格数据策略的更多信息，请参阅 <https://nacnudus.github.io/spreadsheet-munging-strategies/>。
 :::
 
 ### Writing to Excel {#sec-writing-to-excel}
 
-Let's create a small data frame that we can then write out.
-Note that `item` is a factor and `quantity` is an integer.
+让我们创建一个可以随后写入文件的小型数据框。
+请注意，`item` 是一个因子型变量，`quantity` 是一个整型变量。
 
 ```{r}
 bake_sale <- tibble(
@@ -341,7 +339,7 @@ bake_sale <- tibble(
 bake_sale
 ```
 
-You can write data back to disk as an Excel file using the `write_xlsx()` from the [writexl package](https://docs.ropensci.org/writexl/):
+你可以使用 [writexl package](https://docs.ropensci.org/writexl/) 中的 `write_xlsx()` 函数将数据写回磁盘，保存为Excel文件：
 
 ```{r}
 #| eval: false
@@ -349,25 +347,25 @@ You can write data back to disk as an Excel file using the `write_xlsx()` from t
 write_xlsx(bake_sale, path = "data/bake-sale.xlsx")
 ```
 
-@fig-bake-sale-excel shows what the data looks like in Excel.
-Note that column names are included and bolded.
-These can be turned off by setting `col_names` and `format_headers` arguments to `FALSE`.
+@fig-bake-sale-excel 展示了该数据在Excel中的样子。
+请注意，列名已被包含在内并设置为粗体。
+这可以通过将 `col_names` 和 `format_headers` 参数设置为 `FALSE` 来关闭。
 
 ```{r}
 #| label: fig-bake-sale-excel
 #| echo: false
 #| fig-width: 5
 #| fig-cap: |
-#|   Spreadsheet called bake_sale.xlsx in Excel.
+#|   Excel 中名为“bake_sale.xlsx”的电子表格。
 #| fig-alt: |
 #|   Bake sale data frame created earlier in Excel.
 
 knitr::include_graphics("screenshots/import-spreadsheets-bake-sale.png")
 ```
 
-Just like reading from a CSV, information on data type is lost when we read the data back in.
-This makes Excel files unreliable for caching interim results as well.
-For alternatives, see @sec-writing-to-a-file.
+就像从CSV读取数据一样，当我们重新读回这个Excel文件时，数据类型信息会丢失。
+这使得Excel文件也不适合用于缓存中间结果。
+关于其他替代方案，请参见 @sec-writing-to-a-file。
 
 ```{r}
 read_excel("data/bake-sale.xlsx")
@@ -375,19 +373,19 @@ read_excel("data/bake-sale.xlsx")
 
 ### Formatted output
 
-The writexl package is a light-weight solution for writing a simple Excel spreadsheet, but if you're interested in additional features like writing to sheets within a spreadsheet and styling, you will want to use the [openxlsx package](https://ycphs.github.io/openxlsx).
-We won't go into the details of using this package here, but we recommend reading <https://ycphs.github.io/openxlsx/articles/Formatting.html> for an extensive discussion on further formatting functionality for data written from R to Excel with openxlsx.
+writexl 包是写入简单 Excel 电子表格的轻量级解决方案，但如果你需要更多功能，例如在工作簿内的多个工作表写入数据或进行样式设置，那么你可能需要使用 [openxlsx package](https://ycphs.github.io/openxlsx) 包。
+我们在此不深入探讨该包的使用细节，但如果你想了解如何使用openxlsx将从R导出的数据写入Excel并进行更多格式设置，我们推荐阅读其官方文档<https://ycphs.github.io/openxlsx/articles/Formatting.html>。
 
-Note that this package is not part of the tidyverse so the functions and workflows may feel unfamiliar.
-For example, function names are camelCase, multiple functions can't be composed in pipelines, and arguments are in a different order than they tend to be in the tidyverse.
-However, this is ok.
-As your R learning and usage expands outside of this book you will encounter lots of different styles used in various R packages that you might use to accomplish specific goals in R.
-A good way of familiarizing yourself with the coding style used in a new package is to run the examples provided in function documentation to get a feel for the syntax and the output formats as well as reading any vignettes that might come with the package.
+请注意，这个包并不属于tidyverse，因此其函数和工作流程可能会让你感到不太熟悉。
+例如，函数名采用驼峰式命名（camelCase），多个函数不能通过管道符组合使用，而且参数的排列顺序也与tidyverse的习惯不同。
+不过，这很正常。
+随着你在本书之外进一步学习和使用R，你会遇到各种各样的R包，它们为了实现特定目标而采用了不同的编程风格。
+熟悉一个新包编码风格的好方法是：运行函数文档中提供的示例，以感受其语法和输出格式；同时阅读该包可能附带的任何 vignette。
 
 ### Exercises
 
-1.  In an Excel file, create the following dataset and save it as `survey.xlsx`.
-    Alternatively, you can download it as an Excel file from [here](https://docs.google.com/spreadsheets/d/1yc5gL-a2OOBr8M7B3IsDNX5uR17vBHOyWZq6xSTG2G8).
+1.  在一个 Excel 文件中，创建以下数据集并将其保存为 `survey.xlsx`。
+    或者，你也可以从此处下载该 Excel 文件 [here](https://docs.google.com/spreadsheets/d/1yc5gL-a2OOBr8M7B3IsDNX5uR17vBHOyWZq6xSTG2G8)。
 
     ```{r}
     #| echo: false
@@ -403,7 +401,7 @@ A good way of familiarizing yourself with the coding style used in a new package
     knitr::include_graphics("screenshots/import-spreadsheets-survey.png")
     ```
 
-    Then, read it into R, with `survey_id` as a character variable and `n_pets` as a numerical variable.
+    然后，将其读入 R，并将 `survey_id` 指定为字符变量，`n_pets` 指定为数值变量。
 
     ```{r}
     #| echo: false
@@ -419,8 +417,8 @@ A good way of familiarizing yourself with the coding style used in a new package
       )
     ```
 
-2.  In another Excel file, create the following dataset and save it as `roster.xlsx`.
-    Alternatively, you can download it as an Excel file from [here](https://docs.google.com/spreadsheets/d/1LgZ0Bkg9d_NK8uTdP2uHXm07kAlwx8-Ictf8NocebIE).
+2.  在另一个 Excel 文件中，创建以下数据集并将其保存为 `roster.xlsx`。
+    或者，你也可以从此处下载该 Excel 文件 [here](https://docs.google.com/spreadsheets/d/1LgZ0Bkg9d_NK8uTdP2uHXm07kAlwx8-Ictf8NocebIE)。
 
     ```{r}
     #| echo: false
@@ -436,8 +434,8 @@ A good way of familiarizing yourself with the coding style used in a new package
     knitr::include_graphics("screenshots/import-spreadsheets-roster.png")
     ```
 
-    Then, read it into R.
-    The resulting data frame should be called `roster` and should look like the following.
+    然后，将其读入 R。
+    生成的数据框应命名为 `roster`，并且看起来像下面这样。
 
     ```{r}
     #| echo: false
@@ -448,8 +446,8 @@ A good way of familiarizing yourself with the coding style used in a new package
       print(n = 12)
     ```
 
-3.  In a new Excel file, create the following dataset and save it as `sales.xlsx`.
-    Alternatively, you can download it as an Excel file from [here](https://docs.google.com/spreadsheets/d/1oCqdXUNO8JR3Pca8fHfiz_WXWxMuZAp3YiYFaKze5V0).
+3.  在一个新的 Excel 文件中，创建以下数据集并将其保存为 `sales.xlsx`。
+    或者，你也可以从此处下载该 Excel 文件 [here](https://docs.google.com/spreadsheets/d/1oCqdXUNO8JR3Pca8fHfiz_WXWxMuZAp3YiYFaKze5V0)。
 
     ```{r}
     #| echo: false
@@ -464,8 +462,8 @@ A good way of familiarizing yourself with the coding style used in a new package
     ```
 
     a\.
-    Read `sales.xlsx` in and save as `sales`.
-    The data frame should look like the following, with `id` and `n` as column names and with 9 rows.
+    读取 `sales.xlsx` 文件并将其保存为 `sales`。
+    该数据框应如下所示，包含 `id` 和 `n` 作为列名，并且有 9 行数据。
 
     ```{r}
     #| echo: false
@@ -476,8 +474,8 @@ A good way of familiarizing yourself with the coding style used in a new package
     ```
 
     b\.
-    Modify `sales` further to get it into the following tidy format with three columns (`brand`, `id`, and `n`) and 7 rows of data.
-    Note that `id` and `n` are numeric, `brand` is a character variable.
+    进一步修改 `sales`，使其成为如下整洁的格式，包含三列（`brand`、`id` 和 `n`）以及 7 行数据。
+    请注意，`id` 和 `n` 是数值型，`brand` 是字符型变量。
 
     ```{r}
     #| echo: false
@@ -495,47 +493,47 @@ A good way of familiarizing yourself with the coding style used in a new package
       print(n = 7)
     ```
 
-4.  Recreate the `bake_sale` data frame, write it out to an Excel file using the `write.xlsx()` function from the openxlsx package.
+4.  重新创建 `bake_sale` 数据框，并使用 openxlsx 包中的 `write.xlsx()` 函数将其写入一个 Excel 文件。
 
-5.  In @sec-data-import you learned about the `janitor::clean_names()` function to turn columns names into snake case.
-    Read the `students.xlsx` file that we introduced earlier in this section and use this function to "clean" the column names.
+5.  在 @sec-data-import 中，你学习了使用 `janitor::clean_names()` 函数将列名转换为蛇形命名法（snake case）。
+    读取我们本节前文介绍的 `students.xlsx` 文件，并使用此函数来“清洗”列名。
 
-6.  What happens if you try to read in a file with `.xlsx` extension with `read_xls()`?
+6.  如果你尝试用 `read_xls()` 读取一个扩展名为 `.xlsx` 的文件，会发生什么？
 
 ## Google Sheets
 
-Google Sheets is another widely used spreadsheet program.
-It's free and web-based.
-Just like with Excel, in Google Sheets data are organized in worksheets (also called sheets) inside of spreadsheet files.
+Google Sheets 是另一种广泛使用的电子表格程序。
+它是免费的，并且基于网页运行。
+与 Excel 一样，在 Google Sheets 中，数据也组织在电子表格文件内的工作表（也称为 sheets）中。
 
 ### Prerequisites
 
-This section will also focus on spreadsheets, but this time you'll be loading data from a Google Sheet with the **googlesheets4** package.
-This package is non-core tidyverse as well, you need to load it explicitly.
+本节同样聚焦于电子表格，但这次你将使用 **googlesheets4** 包从 Google Sheet 加载数据。
+这个包同样不属于 tidyverse 核心包，你需要显式加载它。
 
 ```{r}
 library(googlesheets4)
 library(tidyverse)
 ```
 
-A quick note about the name of the package: googlesheets4 uses v4 of the [Sheets API v4](https://developers.google.com/sheets/api/) to provide an R interface to Google Sheets, hence the name.
+关于这个包的名称有个简短说明：googlesheets4 使用了 [Sheets API v4](https://developers.google.com/sheets/api/) 来提供 R 与 Google Sheets 的接口，因此得名。
 
 ### Getting started
 
-The main function of the googlesheets4 package is `read_sheet()`, which reads a Google Sheet from a URL or a file id.
-This function also goes by the name `range_read()`.
+googlesheets4 包的主要函数是 `read_sheet()`，它通过 URL 或文件 ID 读取 Google Sheet。
+这个函数还有一个名称是 `range_read()`。
 
-You can also create a brand new sheet with `gs4_create()` or write to an existing sheet with `sheet_write()` and friends.
+你也可以使用 `gs4_create()` 创建一个全新的 sheet，或者使用 `sheet_write()` 及相关函数写入一个已有的 sheet。
 
-In this section we'll work with the same datasets as the ones in the Excel section to highlight similarities and differences between workflows for reading data from Excel and Google Sheets.
-readxl and googlesheets4 packages are both designed to mimic the functionality of the readr package, which provides the `read_csv()` function you've seen in @sec-data-import.
-Therefore, many of the tasks can be accomplished with simply swapping out `read_excel()` for `read_sheet()`.
-However you'll also see that Excel and Google Sheets don't behave in exactly the same way, therefore other tasks may require further updates to the function calls.
+在本节中，我们将使用与 Excel 部分相同的数据集，以突出从 Excel 和 Google Sheets 读取数据的工作流程之间的异同。
+readxl 和 googlesheets4 包都旨在模拟 readr 包的功能，你在 @sec-data-import 中已经见过 readr 包提供的 `read_csv()` 函数。
+因此，许多任务只需简单地将 `read_excel()` 替换为 `read_sheet()` 即可完成。
+但是，你也会发现 Excel 和 Google Sheets 的行为方式并非完全相同，因此其他任务可能需要对函数调用做进一步调整。
 
 ### Reading Google Sheets
 
-@fig-students-googlesheets shows what the spreadsheet we're going to read into R looks like in Google Sheets.
-This is the same dataset as in @fig-students-excel, except it's stored in a Google Sheet instead of Excel.
+@fig-students-googlesheets 展示了我们将要读入 R 的电子表格在 Google Sheets 中的样子。
+这与 @fig-students-excel 中的是同一数据集，只是它存储在 Google Sheet 而非 Excel 中。
 
 ```{r}
 #| label: fig-students-googlesheets
@@ -550,9 +548,9 @@ This is the same dataset as in @fig-students-excel, except it's stored in a Goog
 knitr::include_graphics("screenshots/import-googlesheets-students.png")
 ```
 
-The first argument to `read_sheet()` is the URL of the file to read, and it returns a tibble:\
+`read_sheet()` 的第一个参数是要读取文件的 URL，它会返回一个 tibble：\
 <https://docs.google.com/spreadsheets/d/1V1nPp1tzOuutXFLb3G9Eyxi3qxeEhnOXUzL5_BcCQ0w>.
-These URLs are not pleasant to work with, so you'll often want to identify a sheet by its ID.
+这些 URLs 使用起来不太方便，因此你通常更希望通过其 ID 来标识一个 sheet。
 
 ```{r}
 #| include: false
@@ -566,7 +564,7 @@ gs4_deauth()
 #students
 ```
 
-Just like we did with `read_excel()`, we can supply column names, NA strings, and column types to `read_sheet()`.
+就像我们对 `read_excel()` 所做的那样，我们可以向 `read_sheet()` 提供列名、NA 字符串以及列类型。
 
 ```{r}
 #students <- read_sheet(
@@ -580,25 +578,25 @@ Just like we did with `read_excel()`, we can supply column names, NA strings, an
 #students
 ```
 
-Note that we defined column types a bit differently here, using short codes.
-For example, "dcccc" stands for "double, character, character, character, character".
+请注意，我们在这里定义列类型的方式略有不同，使用了简短代码。
+例如，"dcccc" 代表 "double, character, character, character, character"。
 
-It's also possible to read individual sheets from Google Sheets as well.
-Let's read the "Torgersen Island" sheet from the [penguins Google Sheet](https://pos.it/r4ds-penguins):
+从 Google Sheets 中读取单个工作表也是可行的。
+让我们从 [penguins Google Sheet](https://pos.it/r4ds-penguins) 中读取 "Torgersen Island" 工作表：
 
 ```{r}
 #penguins_sheet_id <- "1aFu8lnD_g0yjF5O-K6SFgSEWiHPpgvFCF0NY9D6LXnY"
 #read_sheet(penguins_sheet_id, sheet = "Torgersen Island")
 ```
 
-You can obtain a list of all sheets within a Google Sheet with `sheet_names()`:
+你可以使用 `sheet_names()` 获取 Google Sheet 中所有工作表的列表：
 
 ```{r}
 #sheet_names(penguins_sheet_id)
 ```
 
-Finally, just like with `read_excel()`, we can read in a portion of a Google Sheet by defining a `range` in `read_sheet()`.
-Note that we're also using the `gs4_example()` function below to locate an example Google Sheet that comes with the googlesheets4 package.
+最后，与 `read_excel()` 类似，我们可以通过在 `read_sheet()` 中定义 `range` 参数来读取 Google Sheet 的一部分。
+请注意，我们在下面也使用了 `gs4_example()` 函数来定位 googlesheets4 包自带的一个示例 Google Sheet。
 
 ```{r}
 #deaths_url <- gs4_example("deaths")
@@ -608,8 +606,8 @@ Note that we're also using the `gs4_example()` function below to locate an examp
 
 ### Writing to Google Sheets
 
-You can write from R to Google Sheets with `write_sheet()`.
-The first argument is the data frame to write, and the second argument is the name (or other identifier) of the Google Sheet to write to:
+你可以使用 `write_sheet()` 将数据从 R 写入 Google Sheets。
+第一个参数是要写入的数据框，第二个参数是要写入的 Google Sheet 的名称（或其他标识符）：
 
 ```{r}
 #| eval: false
@@ -617,7 +615,7 @@ The first argument is the data frame to write, and the second argument is the na
 write_sheet(bake_sale, ss = "bake-sale")
 ```
 
-If you'd like to write your data to a specific (work)sheet inside a Google Sheet, you can specify that with the `sheet` argument as well.
+如果你想要将数据写入 Google Sheet 内的特定工作表，也可以通过 `sheet` 参数来指定。
 
 ```{r}
 #| eval: false
@@ -627,22 +625,22 @@ write_sheet(bake_sale, ss = "bake-sale", sheet = "Sales")
 
 ### Authentication
 
-While you can read from a public Google Sheet without authenticating with your Google account, reading a private sheet or writing to a sheet requires authentication so that googlesheets4 can view and manage *your* Google Sheets.
+虽然你无需通过 Google 账户验证即可读取公开的 Google Sheet，但读取私有 sheet 或写入 sheet 则需要验证，以便 googlesheets4 能够查看和管理你的 Google Sheets。
 
-When you attempt to read in a sheet that requires authentication, googlesheets4 will direct you to a web browser with a prompt to sign in to your Google account and grant permission to operate on your behalf with Google Sheets.
-However, if you want to specify a specific Google account, authentication scope, etc. you can do so with `gs4_auth()`, e.g., `gs4_auth(email = "mine@example.com")`, which will force the use of a token associated with a specific email.
-For further authentication details, we recommend reading the documentation googlesheets4 auth vignette: <https://googlesheets4.tidyverse.org/articles/auth.html>.
+当你尝试读取需要验证的 sheet 时，googlesheets4 会引导你打开网页浏览器，提示你登录 Google 账户并授予其代表你操作 Google Sheets 的权限。
+然而，如果你想指定特定的 Google 账户、验证范围等，可以使用 `gs4_auth()` 来实现，例如 `gs4_auth(email = "mine@example.com")`，这将强制使用与特定电子邮件关联的令牌。
+有关验证的更多细节，我们建议阅读 googlesheets4 验证插文的文档： <https://googlesheets4.tidyverse.org/articles/auth.html>.
 
 ### Exercises
 
-1.  Read the `students` dataset from earlier in the chapter from Excel and also from Google Sheets, with no additional arguments supplied to the `read_excel()` and `read_sheet()` functions.
-    Are the resulting data frames in R exactly the same?
-    If not, how are they different?
+1.  从本章前文的 Excel 和 Google Sheets 中读取 `students` 数据集，在调用 `read_excel()` 和 `read_sheet()` 函数时不提供任何额外参数。
+    在 R 中得到的数据框完全相同吗？
+    如果不是，它们有何不同？
 
-2.  Read the Google Sheet titled survey from <https://pos.it/r4ds-survey>, with `survey_id` as a character variable and `n_pets` as a numerical variable.
+2.  从 <https://pos.it/r4ds-survey> 读取名为 survey 的 Google Sheet，并将 `survey_id` 指定为字符变量，`n_pets` 指定为数值变量。
 
-3.  Read the Google Sheet titled roster from <https://pos.it/r4ds-roster>.
-    The resulting data frame should be called `roster` and should look like the following.
+3.  从 <https://pos.it/r4ds-roster> 读取名为 roster 的 Google Sheet。
+    生成的数据框应命名为 `roster`，并且看起来像下面这样。
 
     ```{r}
     #| echo: false
@@ -655,12 +653,12 @@ For further authentication details, we recommend reading the documentation googl
 
 ## Summary
 
-Microsoft Excel and Google Sheets are two of the most popular spreadsheet systems.
-Being able to interact with data stored in Excel and Google Sheets files directly from R is a superpower!
-In this chapter you learned how to read data into R from spreadsheets from Excel with `read_excel()` from the readxl package and from Google Sheets with `read_sheet()` from the googlesheets4 package.
-These functions work very similarly to each other and have similar arguments for specifying column names, NA strings, rows to skip on top of the file you're reading in, etc.
-Additionally, both functions make it possible to read a single sheet from a spreadsheet as well.
+Microsoft Excel 和 Google Sheets 是两个最流行的电子表格系统。
+能够直接从 R 中与存储在 Excel 和 Google Sheets 文件中的数据进行交互，是一项强大的技能！
+在本章中，你学习了如何使用 readxl 包中的 `read_excel()` 函数将 Excel 电子表格中的数据读入 R，以及如何使用 googlesheets4 包中的 `read_sheet()` 函数将 Google Sheets 中的数据读入 R。
+这些函数的工作方式非常相似，并且具有相似的参数，用于指定列名、NA 字符串、要跳过的文件顶部行数等。
+此外，这两个函数都可以从电子表格中读取单个工作表。
 
-On the other hand, writing to an Excel file requires a different package and function (`writexl::write_xlsx()`) while you can write to a Google Sheet with the googlesheets4 package, with `write_sheet()`.
+另一方面，写入 Excel 文件需要使用不同的包和函数（`writexl::write_xlsx()`），而你可以使用 googlesheets4 包中的 `write_sheet()` 函数写入 Google Sheet。
 
-In the next chapter, you'll learn about a different data source and how to read data from that source into R: databases.
+在下一章中，你将学习一个不同的数据源以及如何将该数据源中的数据读入R：数据库。
